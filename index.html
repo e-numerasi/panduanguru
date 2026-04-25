@@ -535,8 +535,11 @@ table tr:nth-child(even) td {
   justify-content: center;
   text-align: center;
   padding: 60px 50px;
-  position: relative;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
+  box-sizing: border-box;
+  border-radius: inherit;
 }
 .cover::before {
   content: "";
@@ -1931,7 +1934,7 @@ dl.glossary dd {
     <div class="leaf" data-leaf="12">
       <div class="page front">
         <div class="page-inner">
-          <div class="eyebrow">Pertemuan 1 · 90 menit</div>
+          <div class="eyebrow">Pertemuan 1 · 88 menit</div>
           <h3 class="section">SD1 — Konsep Dasar SPtLDV</h3>
           <p class="lead">Konteks: <strong>Jajanan Kantin</strong> — familiar bagi siswa, memungkinkan eksplorasi natural konsep "tepat" vs "maksimal".</p>
           <p>SD1 bertujuan membangun pemahaman konseptual tentang perbedaan fundamental antara <strong>persamaan</strong> dan <strong>pertidaksamaan</strong> linear dua variabel.</p>
@@ -1941,7 +1944,7 @@ dl.glossary dd {
             <strong>C</strong>ontradict (30') — Eksplorasi dengan <em>scaffolding</em> berdiferensiasi<br/>
             <strong>A</strong>nonymous Gallery (15') — Hasil tanpa nama (kode warna), <em>peer feedback</em><br/>
             <strong>L</strong>ock-In (15') — Ko-konstruksi: urutan Quitter→Camper→Climber<br/>
-            <strong>E</strong>xtended (15') — Transfer: <em>"Tepat 15 poin dengan tembakan 2 atau 3 poin"</em></p>
+            <strong>E</strong>xtended (13') — Transfer: <em>"Tepat 15 poin dengan tembakan 2 atau 3 poin"</em></p>
           </div>
           <h4 class="sub">Tabel 4.4 — Scaffolding Berdiferensiasi SD1</h4>
           <table>
@@ -2229,7 +2232,7 @@ dl.glossary dd {
           </table>
           <div class="callout emerald">
             <span class="callout-title">Sistem Penskoran &amp; Klasifikasi</span>
-            <p style="margin: 0; font-size: 11px;">Total skor 36–144. <strong>Quitter</strong>: 36–85 · <strong>Camper</strong>: 86–125 · <strong>Climber</strong>: 126–144. Validitas konstruk dan reliabilitas Cronbach's α &gt; 0,80 wajib dipenuhi sebelum penggunaan.</p>
+            <p style="margin: 0; font-size: 11px;">Total skor 36–180. <strong>Quitter</strong>: 36–84 · <strong>Camper</strong>: 85–134 · <strong>Climber</strong>: 135–180. Validitas konstruk dan reliabilitas Cronbach's α &gt; 0,80 wajib dipenuhi sebelum penggunaan.</p>
           </div>
         </div>
         <div class="page-footer"><span class="ornament"></span>30<span class="ornament"></span></div>
@@ -2344,7 +2347,7 @@ dl.glossary dd {
             <tbody>
               <tr><td><strong>1</strong></td><td>Sebar angket AQ 36 butir, hitung skor total</td><td>Klasifikasi siswa: Quitter / Camper / Climber</td></tr>
               <tr><td><strong>2</strong></td><td>Berikan soal diagnostik &amp; wawancara klinis</td><td>Pemetaan <em>learning obstacles</em> per siswa</td></tr>
-              <tr><td><strong>3</strong></td><td>Kelompokkan siswa secara homogen</td><td>Komposisi kelompok yang produktif</td></tr>
+              <tr><td><strong>3</strong></td><td>Kelompokkan siswa secara heterogen (1Q + 2C + 1Cl per kelompok 4 orang)</td><td>Komposisi kelompok yang produktif</td></tr>
               <tr><td><strong>4</strong></td><td>Siapkan kode warna lembar kerja (sesuai profil) dan media (Desmos, kartu, stabilo)</td><td>Materi siap pakai per fase SCALE</td></tr>
             </tbody>
           </table>
@@ -2363,11 +2366,11 @@ dl.glossary dd {
           <table>
             <thead><tr><th>Fase</th><th>Tindakan Kunci Guru</th></tr></thead>
             <tbody>
-              <tr><td><strong>S</strong> — Set Up Goals</td><td>Aktivasi pengetahuan awal melalui konteks autentik; cek prasyarat aljabar dasar; gali pengalaman siswa.</td></tr>
-              <tr><td><strong>C</strong> — Contradict Adidactic</td><td>Berikan <em>scaffolding</em> berbeda per profil. Quitter: <em>worked example</em> + <em>checklist</em>. Camper: pertanyaan pemandu. Climber: tantangan terbuka, eksplorasi mandiri.</td></tr>
-              <tr><td><strong>A</strong> — Anonymous Gallery</td><td><em>Anonymous Gallery</em> — siswa memajang pekerjaan tanpa identitas; rotasi observasi, komentar konstruktif. Mengurangi kecemasan, mendorong perbandingan strategi.</td></tr>
-              <tr><td><strong>L</strong> — Lock-In</td><td>Sintesis konsep formal dari beragam strategi siswa; bahas miskonsepsi yang muncul; konfirmasi terminologi (titik sudut, daerah feasible, <em>binding constraint</em>).</td></tr>
-              <tr><td><strong>E</strong> — Extended/Evaluated</td><td>Berikan tugas transfer ke konteks baru; <em>fading scaffolding</em> bertahap; refleksi metakognitif tertulis (3 menit).</td></tr>
+              <tr><td><strong>S</strong> — Situate</td><td>Aktivasi pengetahuan awal melalui konteks autentik; cek prasyarat aljabar dasar; gali pengalaman siswa.</td></tr>
+              <tr><td><strong>C</strong> — Construct</td><td>Berikan <em>scaffolding</em> berbeda per profil. Quitter: <em>worked example</em> + <em>checklist</em>. Camper: pertanyaan pemandu. Climber: tantangan terbuka, eksplorasi mandiri.</td></tr>
+              <tr><td><strong>A</strong> — Assess</td><td><em>Anonymous Gallery</em> — siswa memajang pekerjaan tanpa identitas; rotasi observasi, komentar konstruktif. Mengurangi kecemasan, mendorong perbandingan strategi.</td></tr>
+              <tr><td><strong>L</strong> — Link</td><td>Sintesis konsep formal dari beragam strategi siswa; bahas miskonsepsi yang muncul; konfirmasi terminologi (titik sudut, daerah feasible, <em>binding constraint</em>).</td></tr>
+              <tr><td><strong>E</strong> — Extend</td><td>Berikan tugas transfer ke konteks baru; <em>fading scaffolding</em> bertahap; refleksi metakognitif tertulis (3 menit).</td></tr>
             </tbody>
           </table>
           <div class="callout emerald">
@@ -2412,7 +2415,7 @@ dl.glossary dd {
             <thead><tr><th>Indikator</th><th>Target</th></tr></thead>
             <tbody>
               <tr><td><em>N-Gain</em> kemampuan numerasi</td><td>&gt; 0,30 (rata-rata kelas)</td></tr>
-              <tr><td>Pergeseran profil AQ ke arah lebih tinggi</td><td>≥ 20% siswa</td></tr>
+              <tr><td>Pergeseran profil AQ ke arah lebih tinggi</td><td>≥ 30% siswa</td></tr>
               <tr><td>Resolusi <em>learning obstacles</em> teridentifikasi</td><td>≥ 70% per kelompok</td></tr>
               <tr><td>Kepuasan &amp; <em>self-efficacy</em> siswa</td><td>Skor angket &gt; 75%</td></tr>
             </tbody>
