@@ -1,0 +1,2901 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>Buku Panduan Desain Didaktis Numerasi — Flipbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   DESIGN TOKENS
+   ========================================================= */
+:root {
+  --paper: #f5ecd7;
+  --paper-light: #fbf5e3;
+  --paper-shadow: #e8dcb8;
+  --ink: #2a2018;
+  --ink-soft: #4a3d2e;
+  --ink-mute: #7a6b54;
+  --emerald: #1f5f4a;
+  --emerald-deep: #143b2e;
+  --emerald-light: #2c7a60;
+  --gold: #c9a870;
+  --gold-deep: #a07e3f;
+  --gold-soft: #e6d4a3;
+  --maroon: #6b2a1a;
+  --rule: #c4b690;
+
+  --serif: 'Lora', Georgia, serif;
+  --display: 'Cormorant Garamond', 'Times New Roman', serif;
+  --title: 'Cinzel', serif;
+  --ui: 'Inter', -apple-system, sans-serif;
+
+  --book-w: 1080px;
+  --book-h: 720px;
+  --pg-padding-h: 56px;
+  --pg-padding-v: 60px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--serif);
+  background:
+    radial-gradient(ellipse at top, #2a3f3a 0%, #0e1a17 70%),
+    #0e1a17;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ambient texture for backdrop */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(201, 168, 112, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(31, 95, 74, 0.08) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+/* =========================================================
+   HEADER UI
+   ========================================================= */
+.app-header {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 22px;
+  background: rgba(20, 30, 28, 0.65);
+  border: 1px solid rgba(201, 168, 112, 0.25);
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.app-header h1 {
+  font-family: var(--title);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold-soft);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.app-header .divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(201, 168, 112, 0.3);
+}
+.app-header .toc-btn {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  background: transparent;
+  border: 1px solid rgba(201, 168, 112, 0.4);
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.app-header .toc-btn:hover {
+  background: rgba(201, 168, 112, 0.15);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* =========================================================
+   FLIPBOOK STAGE
+   ========================================================= */
+.stage {
+  perspective: 2800px;
+  perspective-origin: 50% 50%;
+  width: 100%;
+  max-width: var(--book-w);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book {
+  position: relative;
+  width: var(--book-w);
+  height: var(--book-h);
+  transform-style: preserve-3d;
+  /* Subtle floating animation */
+  animation: float 8s ease-in-out infinite;
+  filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.55));
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Spine shadow down the middle */
+.book::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 30px;
+  height: 100%;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(90deg,
+      rgba(0,0,0,0) 0%,
+      rgba(0,0,0,0.18) 30%,
+      rgba(0,0,0,0.32) 50%,
+      rgba(0,0,0,0.18) 70%,
+      rgba(0,0,0,0) 100%);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* The "back of the book" — visible behind the rightmost unflipped leaf */
+.book-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  z-index: 0;
+}
+.book-back .half {
+  width: 50%;
+  height: 100%;
+  background:
+    linear-gradient(135deg, #0f2a22 0%, #1a3a30 50%, #0f2a22 100%);
+  border: 1px solid #08171180;
+}
+.book-back .half.left {
+  border-radius: 4px 0 0 4px;
+  box-shadow: inset -4px 0 12px rgba(0,0,0,0.4);
+}
+.book-back .half.right {
+  border-radius: 0 4px 4px 0;
+  box-shadow: inset 4px 0 12px rgba(0,0,0,0.4);
+}
+
+/* =========================================================
+   LEAVES & PAGES
+   ========================================================= */
+.leaf {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  transition: transform 0.95s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+  cursor: pointer;
+}
+.leaf.flipped {
+  transform: rotateY(-180deg);
+}
+.leaf.flipping {
+  cursor: grabbing;
+}
+
+.page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--paper);
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.6) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(232, 220, 184, 0.5) 0%, transparent 50%),
+    repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(180, 160, 110, 0.025) 2px, rgba(180,160,110,0.025) 3px);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.page.front {
+  border-radius: 0 4px 4px 0;
+  box-shadow:
+    inset 12px 0 24px -12px rgba(0,0,0,0.25),
+    inset 0 0 80px rgba(180, 150, 90, 0.06);
+}
+.page.back {
+  transform: rotateY(180deg);
+  border-radius: 4px 0 0 4px;
+  box-shadow:
+    inset -12px 0 24px -12px rgba(0,0,0,0.25),
+    inset 0 0 80px rgba(180, 150, 90, 0.06);
+}
+
+/* Page subtle "deckle" edge decoration */
+.page.front::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(120, 100, 60, 0.18));
+  pointer-events: none;
+}
+.page.back::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(-90deg, transparent, rgba(120, 100, 60, 0.18));
+  pointer-events: none;
+}
+
+/* Page content container */
+.page-inner {
+  flex: 1;
+  padding: var(--pg-padding-v) var(--pg-padding-h);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.page.front .page-inner { padding-right: calc(var(--pg-padding-h) - 12px); padding-left: calc(var(--pg-padding-h) + 12px); }
+.page.back  .page-inner { padding-left: calc(var(--pg-padding-h) - 12px); padding-right: calc(var(--pg-padding-h) + 12px); }
+
+/* Footer (page number) */
+.page-footer {
+  font-family: var(--ui);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--ink-mute);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+.page-footer .ornament {
+  width: 30px;
+  height: 1px;
+  background: var(--rule);
+}
+
+/* =========================================================
+   CONTENT TYPOGRAPHY
+   ========================================================= */
+.eyebrow {
+  font-family: var(--title);
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--emerald);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.eyebrow::before, .eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+  max-width: 40px;
+}
+
+h2.chapter-title {
+  font-family: var(--display);
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1.05;
+  color: var(--ink);
+  margin-bottom: 18px;
+  letter-spacing: -0.01em;
+}
+h3.section {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--emerald-deep);
+  margin: 18px 0 10px 0;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+}
+h4.sub {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--maroon);
+  margin: 12px 0 6px 0;
+}
+
+p {
+  font-family: var(--serif);
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--ink);
+  margin-bottom: 9px;
+  text-align: justify;
+  hyphens: auto;
+}
+p.lead {
+  font-size: 13.5px;
+  line-height: 1.6;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+ul, ol { padding-left: 20px; margin-bottom: 8px; }
+li { font-size: 12px; line-height: 1.55; margin-bottom: 4px; color: var(--ink); }
+
+strong { color: var(--emerald-deep); font-weight: 600; }
+em { font-style: italic; color: var(--ink-soft); }
+
+/* Drop cap for chapter openings */
+.dropcap::first-letter {
+  font-family: var(--display);
+  font-size: 56px;
+  font-weight: 700;
+  float: left;
+  line-height: 0.85;
+  margin: 4px 8px 0 0;
+  color: var(--emerald);
+  font-style: italic;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0;
+  font-size: 10.5px;
+  font-family: var(--serif);
+}
+table th {
+  background: var(--emerald-deep);
+  color: var(--gold-soft);
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 7px 8px;
+  text-align: left;
+  border: 1px solid var(--emerald-deep);
+}
+table td {
+  padding: 6px 8px;
+  border: 1px solid #d4c8a4;
+  background: rgba(255, 255, 255, 0.35);
+  vertical-align: top;
+  line-height: 1.45;
+}
+table tr:nth-child(even) td {
+  background: rgba(232, 220, 184, 0.4);
+}
+
+/* Pull-out callout cards */
+.callout {
+  border: 1px solid var(--gold-deep);
+  background: linear-gradient(135deg, rgba(230, 212, 163, 0.45) 0%, rgba(245, 236, 215, 0.7) 100%);
+  border-radius: 3px;
+  padding: 12px 14px;
+  margin: 10px 0;
+  font-size: 11.5px;
+  position: relative;
+}
+.callout::before {
+  content: "";
+  position: absolute;
+  top: 6px; left: 6px; right: 6px; bottom: 6px;
+  border: 1px solid rgba(160, 126, 63, 0.3);
+  pointer-events: none;
+  border-radius: 1px;
+}
+.callout .callout-title {
+  font-family: var(--title);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--maroon);
+  margin-bottom: 6px;
+  display: block;
+}
+.callout p, .callout li { font-size: 11.5px; }
+.callout.emerald {
+  border-color: var(--emerald);
+  background: linear-gradient(135deg, rgba(44, 122, 96, 0.18), rgba(245, 236, 215, 0.7));
+}
+.callout.emerald .callout-title { color: var(--emerald-deep); }
+
+/* Profile cards */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin: 10px 0;
+}
+.profile-card {
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--emerald);
+  padding: 9px 10px;
+  background: rgba(255,255,255,0.35);
+  border-radius: 2px;
+}
+.profile-card.quitter { border-top-color: var(--maroon); }
+.profile-card.camper  { border-top-color: var(--gold-deep); }
+.profile-card.climber { border-top-color: var(--emerald); }
+.profile-card .name {
+  font-family: var(--title);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.profile-card.quitter .name { color: var(--maroon); }
+.profile-card.camper .name  { color: var(--gold-deep); }
+.profile-card.climber .name { color: var(--emerald-deep); }
+.profile-card .score {
+  font-family: var(--display);
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-mute);
+  margin-bottom: 6px;
+}
+.profile-card ul {
+  padding-left: 14px;
+}
+.profile-card li {
+  font-size: 10.5px;
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+
+/* Ornamental dividers */
+.ornament-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 14px auto;
+  color: var(--gold-deep);
+}
+.ornament-rule .line {
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+  max-width: 90px;
+}
+.ornament-rule .glyph {
+  font-family: var(--display);
+  font-size: 16px;
+  font-style: italic;
+}
+
+/* Two-column flow */
+.two-col {
+  column-count: 2;
+  column-gap: 22px;
+  column-rule: 1px solid rgba(180, 160, 110, 0.25);
+}
+.two-col p { font-size: 11.5px; }
+
+/* =========================================================
+   COVER (special pages)
+   ========================================================= */
+.cover {
+  background:
+    radial-gradient(ellipse at center, #1f5f4a 0%, #143b2e 70%, #0a1f17 100%);
+  color: var(--gold-soft);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 50px;
+  position: relative;
+  overflow: hidden;
+}
+.cover::before {
+  content: "";
+  position: absolute;
+  inset: 26px;
+  border: 1px solid rgba(201, 168, 112, 0.55);
+}
+.cover::after {
+  content: "";
+  position: absolute;
+  inset: 32px;
+  border: 1px solid rgba(201, 168, 112, 0.25);
+}
+.cover .cover-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  justify-content: space-between;
+  padding: 40px 0;
+}
+.cover .cover-mark {
+  font-family: var(--title);
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+.cover .cover-mark::before, .cover .cover-mark::after {
+  content: "❖";
+  margin: 0 14px;
+  color: var(--gold-deep);
+}
+.cover .cover-title-block {
+  text-align: center;
+}
+.cover .cover-eyebrow {
+  font-family: var(--title);
+  font-size: 13px;
+  letter-spacing: 0.5em;
+  color: var(--gold);
+  margin-bottom: 24px;
+}
+.cover h1.cover-title {
+  font-family: var(--display);
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1.0;
+  color: #f3e3b8;
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+.cover h1.cover-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+.cover .cover-subtitle {
+  font-family: var(--display);
+  font-size: 18px;
+  font-style: italic;
+  color: var(--gold-soft);
+  font-weight: 500;
+  margin: 16px 0 28px;
+  letter-spacing: 0.02em;
+}
+.cover .cover-subject {
+  font-family: var(--title);
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  color: var(--gold-soft);
+  padding: 14px 30px;
+  border-top: 1px solid rgba(201, 168, 112, 0.4);
+  border-bottom: 1px solid rgba(201, 168, 112, 0.4);
+  text-transform: uppercase;
+}
+.cover .cover-subject strong { color: var(--gold); font-weight: 700; }
+.cover .cover-foot {
+  text-align: center;
+}
+.cover .cover-audience {
+  font-family: var(--serif);
+  font-size: 12px;
+  font-style: italic;
+  color: var(--gold-soft);
+  margin-bottom: 12px;
+  letter-spacing: 0.04em;
+}
+.cover .cover-year {
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+}
+
+/* Decorative SVG corners on cover */
+.cover .corner {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  z-index: 3;
+  color: var(--gold);
+  opacity: 0.85;
+}
+.cover .corner.tl { top: 20px; left: 20px; }
+.cover .corner.tr { top: 20px; right: 20px; transform: rotate(90deg); }
+.cover .corner.bl { bottom: 20px; left: 20px; transform: rotate(-90deg); }
+.cover .corner.br { bottom: 20px; right: 20px; transform: rotate(180deg); }
+
+/* Inside front cover, back cover */
+.endpaper {
+  background:
+    repeating-linear-gradient(45deg, transparent 0 12px, rgba(31, 95, 74, 0.08) 12px 13px),
+    linear-gradient(135deg, #f0e3c6 0%, #e8d9b4 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+}
+.endpaper .stamp {
+  text-align: center;
+  border: 1px solid var(--emerald);
+  padding: 30px 40px;
+  background: rgba(255,255,255,0.4);
+  max-width: 320px;
+}
+.endpaper .stamp .ornament-rule { margin: 10px auto; }
+.endpaper .stamp h3 {
+  font-family: var(--display);
+  color: var(--emerald-deep);
+  font-style: italic;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+.endpaper .stamp p {
+  font-size: 11px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+/* Chapter divider page */
+.chapter-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  padding: 0 30px;
+}
+.chapter-divider .roman {
+  font-family: var(--display);
+  font-size: 88px;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--gold-deep);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.chapter-divider .label {
+  font-family: var(--title);
+  font-size: 13px;
+  letter-spacing: 0.4em;
+  color: var(--ink-mute);
+  margin-bottom: 22px;
+}
+.chapter-divider h1 {
+  font-family: var(--display);
+  font-size: 38px;
+  font-weight: 600;
+  color: var(--emerald-deep);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin-bottom: 26px;
+  max-width: 80%;
+}
+.chapter-divider .ornament-rule { width: 60%; }
+.chapter-divider .summary {
+  font-family: var(--display);
+  font-size: 14px;
+  font-style: italic;
+  color: var(--ink-soft);
+  max-width: 75%;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   NAVIGATION CONTROLS
+   ========================================================= */
+.nav-controls {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 18px;
+  background: rgba(20, 30, 28, 0.65);
+  border: 1px solid rgba(201, 168, 112, 0.25);
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.nav-btn {
+  background: transparent;
+  border: 1px solid rgba(201, 168, 112, 0.4);
+  color: var(--gold-soft);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.25s ease;
+  font-family: var(--ui);
+}
+.nav-btn:hover:not(:disabled) {
+  background: rgba(201, 168, 112, 0.18);
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-1px);
+}
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.page-counter {
+  font-family: var(--ui);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--gold-soft);
+  min-width: 90px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.page-counter .current {
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* =========================================================
+   TABLE OF CONTENTS DRAWER
+   ========================================================= */
+.toc-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 18, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.toc-overlay.open {
+  display: flex;
+  opacity: 1;
+}
+.toc-panel {
+  background: var(--paper);
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.6), transparent 50%);
+  max-width: 700px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 40px 50px;
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  position: relative;
+  transform: scale(0.96);
+  transition: transform 0.3s ease;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+}
+.toc-overlay.open .toc-panel { transform: scale(1); }
+.toc-panel::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(160, 126, 63, 0.3);
+  pointer-events: none;
+}
+.toc-panel h2 {
+  font-family: var(--display);
+  font-size: 32px;
+  color: var(--emerald-deep);
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 4px;
+}
+.toc-panel .toc-sub {
+  font-family: var(--title);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--ink-mute);
+  text-align: center;
+  margin-bottom: 22px;
+}
+.toc-list {
+  list-style: none;
+  padding: 0;
+}
+.toc-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 6px;
+  margin: 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border-radius: 2px;
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--ink);
+}
+.toc-list li:hover {
+  background: rgba(201, 168, 112, 0.18);
+}
+.toc-list li .toc-num {
+  font-family: var(--title);
+  color: var(--gold-deep);
+  letter-spacing: 0.1em;
+  font-size: 11px;
+  flex-shrink: 0;
+  width: 50px;
+}
+.toc-list li .toc-title {
+  flex: 1;
+}
+.toc-list li.chapter .toc-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--emerald-deep);
+}
+.toc-list li .toc-pg {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-mute);
+  font-variant-numeric: tabular-nums;
+}
+.toc-list li .toc-dots {
+  flex: 0 0 auto;
+  border-bottom: 1px dotted var(--rule);
+  flex: 1;
+  margin-bottom: 4px;
+  min-width: 20px;
+}
+.toc-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: transparent;
+  border: 1px solid var(--rule);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--ink-soft);
+  font-size: 18px;
+  z-index: 10;
+}
+.toc-close:hover { background: rgba(0,0,0,0.06); color: var(--ink); }
+
+/* =========================================================
+   LOADER & HINT
+   ========================================================= */
+.hint {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--ui);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(230, 212, 163, 0.5);
+  z-index: 50;
+  pointer-events: none;
+  animation: hintFade 6s ease-in-out forwards;
+}
+@keyframes hintFade {
+  0%, 60% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* =========================================================
+   MOBILE / RESPONSIVE
+   ========================================================= */
+@media (max-width: 1180px) {
+  .stage {
+    transform: scale(calc(0.94 * (100vw - 40px) / 1080));
+    transform-origin: center center;
+  }
+}
+@media (max-width: 760px) {
+  body { padding: 60px 8px 80px; }
+  :root {
+    --book-w: 96vw;
+    --book-h: calc(96vw * 1.4);
+    --pg-padding-h: 22px;
+    --pg-padding-v: 28px;
+  }
+  .stage { transform: none; }
+  .book {
+    width: var(--book-w);
+    height: var(--book-h);
+  }
+  /* On mobile: show single page, hide left half of leaves, show only fronts */
+  .leaf {
+    width: 100%;
+    left: 0;
+    transform-origin: center center;
+    transition: transform 0.6s ease, opacity 0.4s ease;
+  }
+  .leaf.flipped {
+    transform: translateX(-110%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .page.back { display: none; }
+  .page.front { border-radius: 4px; }
+  .book::after { display: none; }
+  .book-back { display: none; }
+  h1.cover-title { font-size: 36px; }
+  .cover .cover-subtitle { font-size: 14px; }
+  .cover .cover-eyebrow { font-size: 10px; letter-spacing: 0.3em; }
+  .cover .cover-subject { font-size: 10px; padding: 10px 16px; }
+  .cover .cover-year { font-size: 24px; }
+  h2.chapter-title { font-size: 24px; }
+  h3.section { font-size: 16px; }
+  h4.sub { font-size: 14px; }
+  p, li { font-size: 11.5px; }
+  table { font-size: 10px; }
+  table th, table td { padding: 5px 6px; }
+  .chapter-divider .roman { font-size: 60px; }
+  .chapter-divider h1 { font-size: 24px; }
+  .profile-grid { grid-template-columns: 1fr; }
+  .two-col { column-count: 1; }
+  .app-header h1 { font-size: 11px; letter-spacing: 0.12em; }
+  .app-header { padding: 8px 14px; gap: 8px; }
+  .toc-panel { padding: 24px 22px; }
+  .toc-panel h2 { font-size: 22px; }
+  .toc-list li .toc-num { width: 40px; font-size: 10px; }
+  .toc-list li.chapter .toc-title { font-size: 13px; }
+  .toc-list li { font-size: 11.5px; }
+}
+
+/* ============= Additional styles for later leaves ============= */
+
+/* Maroon callout variant */
+.callout.maroon {
+  border-color: var(--maroon);
+  background: linear-gradient(135deg, rgba(107, 42, 26, 0.10), rgba(245, 236, 215, 0.7));
+}
+.callout.maroon .callout-title { color: var(--maroon); }
+
+/* Profile card alternate label structure used in LKPD section */
+.profile-card .profile-name {
+  font-family: var(--title);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.profile-card .profile-tag {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* Bibliography list */
+ul.biblio {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+ul.biblio li {
+  font-family: var(--body);
+  font-size: 11.5px;
+  line-height: 1.55;
+  padding: 8px 0 8px 22px;
+  border-bottom: 1px dotted rgba(60, 50, 35, 0.18);
+  text-indent: -22px;
+  margin-left: 22px;
+}
+ul.biblio li:last-child { border-bottom: none; }
+
+/* Glossary definition list */
+dl.glossary {
+  margin: 0;
+  padding: 0;
+  font-size: 11.5px;
+}
+dl.glossary dt {
+  font-family: var(--title);
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  color: var(--emerald-deep);
+  margin-top: 8px;
+}
+dl.glossary dt:first-child { margin-top: 0; }
+dl.glossary dd {
+  font-family: var(--body);
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 2px 0 6px 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--gold);
+}
+
+/* Closing quote (refleksi akhir) */
+.closing-quote {
+  margin: 14px 0;
+  padding: 16px 20px;
+  background: linear-gradient(180deg, rgba(44, 122, 96, 0.06), rgba(245, 236, 215, 0));
+  border-left: 3px solid var(--gold-deep);
+  border-right: 3px solid var(--gold-deep);
+}
+
+/* Endpaper (back side) */
+.endpaper-back {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(201, 168, 112, 0.12) 0%, transparent 55%),
+    radial-gradient(circle at 70% 80%, rgba(20, 59, 46, 0.08) 0%, transparent 60%),
+    var(--paper) !important;
+}
+.endpaper-back .page-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.endpaper-content {
+  text-align: center;
+  max-width: 80%;
+}
+.endpaper-glyph {
+  font-size: 38px;
+  color: var(--gold-deep);
+  margin-bottom: 18px;
+}
+.endpaper-line {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 14.5px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin: 4px 0;
+}
+
+/* Back cover */
+.back-cover {
+  background:
+    radial-gradient(circle at 80% 10%, rgba(201, 168, 112, 0.10) 0%, transparent 55%),
+    radial-gradient(circle at 10% 90%, rgba(201, 168, 112, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, #0d2a20 0%, #143b2e 50%, #0a1f17 100%) !important;
+  color: #f5ecd7 !important;
+  position: relative;
+}
+.back-cover::after {
+  content: "";
+  position: absolute;
+  inset: 24px;
+  border: 1px solid rgba(201, 168, 112, 0.35);
+  border-radius: 2px;
+  pointer-events: none;
+}
+.back-cover-inner {
+  position: absolute;
+  inset: 50px 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 1;
+}
+.back-cover-top { text-align: center; }
+.back-cover-eyebrow {
+  font-family: var(--title);
+  font-size: 10px;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+.back-cover-glyph {
+  font-size: 26px;
+  color: var(--gold);
+  opacity: 0.85;
+}
+.back-cover-blurb {
+  font-family: var(--display);
+  font-size: 14px;
+  line-height: 1.6;
+  color: #e8dcb8;
+  text-align: center;
+  padding: 0 6px;
+}
+.back-cover-blurb p { margin: 0 0 12px 0; }
+.back-cover-quote {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 15px;
+  text-align: center;
+  color: var(--gold);
+  padding: 16px 20px;
+  border-top: 1px solid rgba(201, 168, 112, 0.35);
+  border-bottom: 1px solid rgba(201, 168, 112, 0.35);
+  margin: 18px 0;
+  line-height: 1.5;
+}
+.back-cover-bottom {
+  text-align: center;
+  padding-top: 12px;
+}
+.back-cover-publisher .pub-mark {
+  font-size: 22px;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.back-cover-publisher .pub-name {
+  font-family: var(--title);
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+/* Number list improvements (used in conclusion) */
+.page-inner ol {
+  font-family: var(--body);
+}
+.page-inner ol li {
+  margin-bottom: 6px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="app-header">
+  <h1>Desain Didaktis Numerasi</h1>
+  <span class="divider"></span>
+  <button class="toc-btn" id="tocBtn">Daftar Isi</button>
+</div>
+
+<!-- Hint -->
+<div class="hint">← Klik tepi halaman atau gunakan panah untuk membuka →</div>
+
+<!-- Stage -->
+<div class="stage">
+  <div class="book" id="book">
+
+    <!-- Permanent back of book (visible behind unflipped leaves) -->
+    <div class="book-back">
+      <div class="half left"></div>
+      <div class="half right"></div>
+    </div>
+
+    <!-- LEAVES START HERE -->
+    <!-- Each .leaf has .page.front (odd page) and .page.back (next even page) -->
+    <!-- Pages will be inserted by the next file edits -->
+
+    <!-- LEAF 1 : COVER + INSIDE FRONT COVER -->
+    <div class="leaf" data-leaf="0">
+      <div class="page front">
+        <div class="cover">
+          <svg class="corner tl" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1">
+            <path d="M2 20 L2 2 L20 2" />
+            <path d="M2 30 L2 8 L8 8 L8 30" opacity="0.6" />
+            <circle cx="14" cy="14" r="2" fill="currentColor" stroke="none"/>
+          </svg>
+          <svg class="corner tr" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1">
+            <path d="M2 20 L2 2 L20 2" />
+            <path d="M2 30 L2 8 L8 8 L8 30" opacity="0.6" />
+            <circle cx="14" cy="14" r="2" fill="currentColor" stroke="none"/>
+          </svg>
+          <svg class="corner bl" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1">
+            <path d="M2 20 L2 2 L20 2" />
+            <path d="M2 30 L2 8 L8 8 L8 30" opacity="0.6" />
+            <circle cx="14" cy="14" r="2" fill="currentColor" stroke="none"/>
+          </svg>
+          <svg class="corner br" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1">
+            <path d="M2 20 L2 2 L20 2" />
+            <path d="M2 30 L2 8 L8 8 L8 30" opacity="0.6" />
+            <circle cx="14" cy="14" r="2" fill="currentColor" stroke="none"/>
+          </svg>
+
+          <div class="cover-content">
+            <div class="cover-mark">Buku Panduan</div>
+
+            <div class="cover-title-block">
+              <div class="cover-eyebrow">Untuk Guru Matematika</div>
+              <h1 class="cover-title">Desain<br/>Didaktis<br/><em>Numerasi</em></h1>
+              <div class="cover-subtitle">Berbasis Scaffolded Instruction<br/>dan Adversity Quotient</div>
+              <div class="cover-subject">Sistem Pertidaksamaan<br/><strong>Linear Dua Variabel</strong></div>
+            </div>
+
+            <div class="cover-foot">
+              <div class="cover-audience">untuk SMA · SMK · MA</div>
+              <div class="cover-year">2025</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="page back">
+        <div class="endpaper">
+          <div class="stamp">
+            <div class="ornament-rule">
+              <span class="line"></span>
+              <span class="glyph">§</span>
+              <span class="line"></span>
+            </div>
+            <h3>Ex Libris</h3>
+            <p>Buku panduan praktis untuk implementasi pembelajaran matematika yang responsif terhadap keberagaman karakteristik siswa.</p>
+            <div class="ornament-rule">
+              <span class="line"></span>
+              <span class="glyph">❖</span>
+              <span class="line"></span>
+            </div>
+            <p style="font-family: var(--title); font-size:10px; letter-spacing:0.18em; color: var(--emerald-deep);">MAKASSAR · DESEMBER · MMXXV</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEAF 1 : Title Page (front) + Kata Pengantar (back) -->
+    <div class="leaf" data-leaf="1">
+      <div class="page front">
+        <div class="page-inner" style="justify-content: center; align-items: center; text-align: center;">
+          <div style="border: 1px solid var(--gold-deep); padding: 40px 36px; max-width: 78%; position: relative;">
+            <div style="position: absolute; inset: 6px; border: 1px solid rgba(160, 126, 63, 0.3); pointer-events: none;"></div>
+            <div class="ornament-rule" style="margin-top: 0;">
+              <span class="line"></span><span class="glyph">❖</span><span class="line"></span>
+            </div>
+            <div style="font-family: var(--title); font-size: 11px; letter-spacing: 0.32em; color: var(--ink-mute); margin-bottom: 18px;">BUKU PANDUAN</div>
+            <h1 style="font-family: var(--display); font-size: 34px; font-weight: 700; color: var(--emerald-deep); line-height: 1.1; margin-bottom: 14px;">Desain Didaktis<br/><em style="color:var(--maroon)">Numerasi</em></h1>
+            <p style="font-family: var(--display); font-size: 14px; font-style: italic; color: var(--ink-soft); margin-bottom: 18px; text-align: center;">Berbasis <em>Scaffolded Instruction</em><br/>dan <em>Adversity Quotient</em></p>
+            <div class="ornament-rule"><span class="line"></span><span class="glyph">§</span><span class="line"></span></div>
+            <div style="font-family: var(--title); font-size: 10px; letter-spacing: 0.28em; color: var(--maroon); line-height: 1.8;">PEMBELAJARAN<br/><span style="color: var(--emerald-deep); font-size: 12px;">SISTEM PERTIDAKSAMAAN<br/>LINEAR DUA VARIABEL</span><br/>(SPTLDV)</div>
+            <div class="ornament-rule"><span class="line"></span><span class="glyph">§</span><span class="line"></span></div>
+            <p style="font-size: 11px; color: var(--ink-soft); text-align: center; font-style: italic;">Untuk Guru Matematika<br/>SMA · SMK · MA</p>
+            <div style="font-family: var(--display); font-size: 28px; font-weight: 700; color: var(--gold-deep); margin-top: 14px;">2025</div>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>i<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Prakata</div>
+          <h2 class="chapter-title">Kata Pengantar</h2>
+          <p class="dropcap">Puji syukur kami panjatkan ke hadirat Tuhan Yang Maha Esa atas terselesaikannya Buku Panduan Desain Didaktis Numerasi Berbasis <em>Scaffolded Instruction</em> dan <em>Adversity Quotient</em> ini. Buku panduan ini disusun sebagai respons terhadap kondisi kemampuan numerasi siswa Indonesia yang masih memerlukan perhatian serius, sebagaimana tercermin dari hasil PISA dan Asesmen Nasional.</p>
+          <p>Data empiris menunjukkan bahwa kemampuan numerasi siswa Indonesia masih berada jauh di bawah rata-rata global dengan gap yang signifikan. Kondisi ini semakin kompleks ketika dikaitkan dengan keberagaman karakteristik siswa dalam menghadapi tantangan pembelajaran matematika. Oleh karena itu, diperlukan pendekatan pembelajaran yang tidak hanya berfokus pada aspek kognitif, tetapi juga mempertimbangkan aspek psikologis siswa, khususnya kemampuan mereka dalam menghadapi kesulitan (<em>Adversity Quotient</em>).</p>
+          <p>Buku panduan ini menyajikan desain didaktis yang dikembangkan melalui penelitian mendalam dengan mengintegrasikan teori <em>learning obstacles</em>, <em>scaffolded instruction</em>, dan <em>Adversity Quotient</em> dalam konteks pembelajaran Sistem Pertidaksamaan Linear Dua Variabel (SPTLDV). Desain ini dirancang untuk mengakomodasi keberagaman karakteristik siswa dengan memberikan dukungan (<em>scaffolding</em>) yang terdiferensiasi berdasarkan profil <em>Adversity Quotient</em> mereka.</p>
+          <p>Kami berharap buku panduan ini dapat menjadi referensi praktis bagi guru matematika SMA/SMK/MA dalam merancang dan mengimplementasikan pembelajaran numerasi yang efektif dan responsif terhadap kebutuhan individual siswa. Kritik dan saran yang konstruktif sangat kami harapkan untuk penyempurnaan buku panduan ini di masa mendatang.</p>
+          <div class="ornament-rule"><span class="line"></span><span class="glyph">❖</span><span class="line"></span></div>
+          <p style="text-align: right; font-style: italic; font-family: var(--display); font-size: 14px; color: var(--ink-soft); margin-top: auto;">Makassar, Desember 2025<br/><strong style="color: var(--emerald-deep);">— Penulis</strong></p>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>ii<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 2 : Daftar Isi (front) + Petunjuk Penggunaan (back) -->
+    <div class="leaf" data-leaf="2">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Index</div>
+          <h2 class="chapter-title">Daftar Isi</h2>
+          <ul class="toc-list" style="margin-top: 6px;">
+            <li><span class="toc-num">—</span><span class="toc-title">Kata Pengantar</span><span class="toc-dots"></span><span class="toc-pg">i</span></li>
+            <li><span class="toc-num">—</span><span class="toc-title">Petunjuk Penggunaan Buku</span><span class="toc-dots"></span><span class="toc-pg">iv</span></li>
+            <li class="chapter"><span class="toc-num">BAB I</span><span class="toc-title">Pendahuluan</span><span class="toc-dots"></span><span class="toc-pg">1</span></li>
+            <li><span class="toc-num"></span><span class="toc-title">Latar Belakang &amp; Data Empiris</span><span class="toc-dots"></span><span class="toc-pg">1</span></li>
+            <li><span class="toc-num"></span><span class="toc-title">Tujuan, Sasaran &amp; Kompetensi</span><span class="toc-dots"></span><span class="toc-pg">3</span></li>
+            <li class="chapter"><span class="toc-num">BAB II</span><span class="toc-title">Landasan Konseptual</span><span class="toc-dots"></span><span class="toc-pg">5</span></li>
+            <li><span class="toc-num"></span><span class="toc-title">Adversity Quotient · Learning Obstacles</span><span class="toc-dots"></span><span class="toc-pg">6</span></li>
+            <li><span class="toc-num"></span><span class="toc-title">Scaffolded Instruction · Metode SCALE</span><span class="toc-dots"></span><span class="toc-pg">10</span></li>
+            <li class="chapter"><span class="toc-num">BAB III</span><span class="toc-title">Identifikasi &amp; Pengelompokan</span><span class="toc-dots"></span><span class="toc-pg">14</span></li>
+            <li class="chapter"><span class="toc-num">BAB IV</span><span class="toc-title">Implementasi Desain Didaktis</span><span class="toc-dots"></span><span class="toc-pg">24</span></li>
+            <li><span class="toc-num"></span><span class="toc-title">Pertemuan 1–8 (SD &amp; Tes)</span><span class="toc-dots"></span><span class="toc-pg">27</span></li>
+            <li class="chapter"><span class="toc-num">BAB V</span><span class="toc-title">Instrumen Penelitian</span><span class="toc-dots"></span><span class="toc-pg">38</span></li>
+            <li class="chapter"><span class="toc-num">BAB VI</span><span class="toc-title">Panduan Penggunaan untuk Guru</span><span class="toc-dots"></span><span class="toc-pg">51</span></li>
+            <li class="chapter"><span class="toc-num">BAB VII</span><span class="toc-title">Penutup</span><span class="toc-dots"></span><span class="toc-pg">59</span></li>
+            <li><span class="toc-num">—</span><span class="toc-title">Daftar Pustaka</span><span class="toc-dots"></span><span class="toc-pg">62</span></li>
+            <li><span class="toc-num">—</span><span class="toc-title">Glosarium</span><span class="toc-dots"></span><span class="toc-pg">63</span></li>
+          </ul>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>iii<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Pengantar Praktis</div>
+          <h2 class="chapter-title">Petunjuk Penggunaan Buku</h2>
+          <p>Buku panduan ini dirancang untuk memudahkan guru dalam mengimplementasikan Desain Didaktis Numerasi berbasis <em>Scaffolded Instruction</em> dan <em>Adversity Quotient</em>. Berikut adalah lima langkah utama penggunaan:</p>
+          <table>
+            <thead><tr><th style="width:8%;">№</th><th>Langkah Penggunaan</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1</strong></td><td><strong>PAHAMI LANDASAN KONSEPTUAL.</strong> Baca BAB II untuk memahami konsep dasar AQ, <em>Learning Obstacles</em>, dan <em>Scaffolded Instruction</em>.</td></tr>
+              <tr><td><strong>2</strong></td><td><strong>IDENTIFIKASI SISWA.</strong> Gunakan instrumen pada BAB III untuk mengidentifikasi profil AQ siswa dan <em>learning obstacles</em> melalui Angket ARP dan Tes Diagnostik.</td></tr>
+              <tr><td><strong>3</strong></td><td><strong>IMPLEMENTASIKAN PEMBELAJARAN.</strong> Ikuti panduan implementasi pada BAB IV: 8 pertemuan (4 SD + 4 Tes Berjenjang).</td></tr>
+              <tr><td><strong>4</strong></td><td><strong>GUNAKAN INSTRUMEN.</strong> Manfaatkan LKPD terdiferensiasi, soal tes berjenjang, dan lembar observasi pada BAB V.</td></tr>
+              <tr><td><strong>5</strong></td><td><strong>EVALUASI &amp; REFLEKSI.</strong> Lakukan evaluasi pembelajaran menggunakan panduan pada BAB VI dan tentukan tindak lanjut.</td></tr>
+            </tbody>
+          </table>
+          <h3 class="section">Struktur Pembelajaran 8 Pertemuan</h3>
+          <table>
+            <thead><tr><th>Pertemuan</th><th>Jenis Kegiatan</th><th>Durasi</th><th>Fokus</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Situasi Didaktis 1</td><td>90 menit</td><td>Konsep Dasar</td></tr>
+              <tr><td>2</td><td>Tes Numerasi Berjenjang 1</td><td>70 menit</td><td>Asesmen</td></tr>
+              <tr><td>3</td><td>Situasi Didaktis 2</td><td>90 menit</td><td>Representasi Grafis</td></tr>
+              <tr><td>4</td><td>Tes Numerasi Berjenjang 2</td><td>70 menit</td><td>Asesmen</td></tr>
+              <tr><td>5</td><td>Situasi Didaktis 3</td><td>90 menit</td><td>Jenis Daerah</td></tr>
+              <tr><td>6</td><td>Tes Numerasi Berjenjang 3</td><td>70 menit</td><td>Asesmen</td></tr>
+              <tr><td>7</td><td>Situasi Didaktis 4</td><td>90 menit</td><td>Optimasi</td></tr>
+              <tr><td>8</td><td>Tes Numerasi Berjenjang 4</td><td>70 menit</td><td>Asesmen Sumatif</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>iv<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 3 : BAB I divider (front) + Latar Belakang p1 (back) -->
+    <div class="leaf" data-leaf="3">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="chapter-divider">
+            <div class="roman">I</div>
+            <div class="label">Bab Pertama</div>
+            <h1>Pendahuluan</h1>
+            <div class="ornament-rule"><span class="line"></span><span class="glyph">❖</span><span class="line"></span></div>
+            <p class="summary">Latar belakang transformasi sistem evaluasi pendidikan, kondisi numerasi siswa Indonesia, tujuan, sasaran, dan kompetensi yang dikembangkan.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>1<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bab I · A</div>
+          <h3 class="section">Latar Belakang</h3>
+          <p class="dropcap">Transformasi sistem evaluasi pendidikan nasional dari Ujian Nasional menjadi <strong>Asesmen Nasional</strong> menandai paradigma baru dalam pengukuran kualitas pembelajaran di Indonesia. Perubahan ini bukan sekadar modifikasi instrumen evaluasi, melainkan refleksi mendalam atas pemahaman bahwa luaran pembelajaran sejatinya korelatif secara signifikan dengan kualitas proses pembelajaran yang dirancang dan diimplementasikan guru.</p>
+          <p>Kemampuan numerasi didefinisikan sebagai kemampuan menggunakan konsep, prosedur, fakta, dan alat matematika untuk menyelesaikan masalah sehari-hari. Kemampuan ini tidak terbatas pada kompetensi matematis, melainkan mencakup kemampuan berpikir kritis, penalaran logis, dan aplikasi konsep matematis dalam konteks kehidupan nyata yang kompleks dan dinamis.</p>
+          <h4 class="sub">Tabel 1.1 — Skor Numerasi Indonesia dalam PISA</h4>
+          <table>
+            <thead><tr><th>Tahun PISA</th><th>Skor Indonesia</th><th>Rata-rata OECD</th><th>Gap</th></tr></thead>
+            <tbody>
+              <tr><td>2018</td><td>379</td><td>489</td><td style="color:var(--maroon);"><strong>−110</strong></td></tr>
+              <tr><td>2022</td><td>366</td><td>472</td><td style="color:var(--maroon);"><strong>−106</strong></td></tr>
+            </tbody>
+          </table>
+          <p>Pada PISA 2022, skor numerasi siswa Indonesia mengalami penurunan menjadi 366 — turun 13 poin dari 2018 yang mengindikasikan permasalahan struktural dalam sistem pembelajaran matematika di Indonesia. Gap yang menganga dengan rata-rata OECD (106–110 poin) mencerminkan tantangan serius bagi sistem pendidikan nasional.</p>
+          <h4 class="sub">Tabel 1.2 — Numerasi Sulawesi Selatan vs. Nasional</h4>
+          <table>
+            <thead><tr><th>Tahun</th><th>Nasional</th><th>Sulsel</th><th>Gap</th><th>Kategori</th></tr></thead>
+            <tbody>
+              <tr><td>2022</td><td>47,62%</td><td>38,10%</td><td>−9,52%</td><td>Kurang</td></tr>
+              <tr><td>2023</td><td>66,30%</td><td>53,04%</td><td>−13,26%</td><td>Sedang</td></tr>
+              <tr><td>2024</td><td>70,31%</td><td>56,25%</td><td>−14,06%</td><td>Sedang</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>2<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 4 : Latar Belakang lanjutan (front) + Tujuan & Kompetensi (back) -->
+    <div class="leaf" data-leaf="4">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Akar Permasalahan</div>
+          <h3 class="section">Learning Obstacles &amp; Adversity Quotient</h3>
+          <p>Investigasi mendalam terhadap akar permasalahan numerasi mengungkapkan bahwa kelemahan paling signifikan pada siswa Indonesia terdapat pada konten <em>change and relationship</em> yang sangat erat kaitannya dengan materi <strong>aljabar</strong>. Domain ini mencakup salah satu materi fundamental yaitu <strong>Sistem Pertidaksamaan Linear Dua Variabel</strong>.</p>
+          <h4 class="sub">Tabel 1.3 — Studi Pendahuluan SMA</h4>
+          <table>
+            <thead><tr><th>Sekolah</th><th>Siswa</th><th>Rata-rata</th><th>% Tuntas</th></tr></thead>
+            <tbody>
+              <tr><td>SMAN 21 Makassar</td><td>36</td><td>46,8</td><td>16,7%</td></tr>
+              <tr><td>SMAN 7 Makassar</td><td>32</td><td>42,1</td><td>13,3%</td></tr>
+              <tr><td><strong>Rata-rata</strong></td><td>—</td><td><strong>44,5</strong></td><td><strong>15,0%</strong></td></tr>
+            </tbody>
+          </table>
+          <p>Konseptualisasi hambatan belajar berakar pada pemikiran <strong>Brousseau</strong>. Secara teoretis, <em>learning obstacles</em> diklasifikasikan menjadi tiga jenis utama:</p>
+          <div class="callout">
+            <span class="callout-title">Tiga Jenis Hambatan Belajar</span>
+            <ul>
+              <li><strong>Hambatan Epistemologis</strong> — kompleksitas dan karakteristik intrinsik konsep matematika.</li>
+              <li><strong>Hambatan Ontologis</strong> — kesiapan mental dan struktur kognitif siswa.</li>
+              <li><strong>Hambatan Didaktis</strong> — ketidaktepatan pendekatan, metode, atau strategi pengajaran.</li>
+            </ul>
+          </div>
+          <p>Sebagai respon terhadap kompleksitas tersebut, <strong>desain didaktis</strong> muncul sebagai pendekatan sistematis dalam merancang pembelajaran matematika berdasarkan analisis mendalam terhadap karakteristik konsep, hambatan belajar, dan situasi didaktis yang optimal.</p>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>3<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bab I · B–E</div>
+          <h3 class="section">Tujuan, Sasaran &amp; Kompetensi</h3>
+          <h4 class="sub">B. Tujuan Khusus</h4>
+          <ul>
+            <li>Membantu guru mengidentifikasi profil <em>Adversity Quotient</em> siswa melalui instrumen ARP.</li>
+            <li>Memfasilitasi identifikasi <em>learning obstacles</em> melalui tes diagnostik numerasi.</li>
+            <li>Menyediakan desain didaktis terstruktur dengan empat situasi didaktis progresif.</li>
+            <li>Memberikan panduan <em>scaffolding</em> terdiferensiasi untuk Quitter, Camper, dan Climber.</li>
+            <li>Menyediakan instrumen tes numerasi berjenjang untuk mengukur perkembangan siswa.</li>
+          </ul>
+          <h4 class="sub">C. Sasaran Pengguna</h4>
+          <p>Buku ini ditujukan bagi <strong>Guru Matematika SMA/SMK/MA</strong>, calon guru (mahasiswa PPG/Pendidikan Matematika), praktisi pendidikan matematika, serta pengawas dan kepala sekolah.</p>
+          <h4 class="sub">E. Kompetensi yang Dikembangkan</h4>
+          <div class="callout emerald">
+            <span class="callout-title">Kompetensi Pedagogis Guru</span>
+            <ul style="margin-bottom: 0;">
+              <li>Mengidentifikasi siswa berdasarkan profil <em>Adversity Quotient</em>.</li>
+              <li>Mendiagnosis <em>learning obstacles</em> dalam pembelajaran numerasi.</li>
+              <li>Merancang Antisipasi Didaktis Pedagogis (ADP) yang responsif.</li>
+              <li>Memberikan <em>scaffolding</em> terdiferensiasi sesuai karakteristik siswa.</li>
+              <li>Mengimplementasikan metode <strong>SCALE</strong> dalam pembelajaran numerasi.</li>
+            </ul>
+          </div>
+          <div class="callout">
+            <span class="callout-title">Kompetensi Numerasi Siswa</span>
+            <ul style="margin-bottom: 0;">
+              <li>Memahami konsep dasar SPtLDV dan karakteristik solusinya.</li>
+              <li>Merepresentasikan solusi grafik dengan interpretasi tepat.</li>
+              <li>Mengidentifikasi jenis daerah penyelesaian (terbatas, tak terbatas, kosong).</li>
+              <li>Menerapkan metode titik sudut untuk masalah optimasi linear.</li>
+              <li>Mengembangkan resiliensi dalam menghadapi tantangan matematika.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>4<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 5 : BAB II divider (front) + Adversity Quotient (back) -->
+    <div class="leaf" data-leaf="5">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="chapter-divider">
+            <div class="roman">II</div>
+            <div class="label">Bab Kedua</div>
+            <h1>Landasan Konseptual</h1>
+            <div class="ornament-rule"><span class="line"></span><span class="glyph">❖</span><span class="line"></span></div>
+            <p class="summary">Adversity Quotient · Learning Obstacles · Scaffolded Instruction · Desain Didaktis · Metode SCALE.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>5<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bab II · A</div>
+          <h3 class="section">Adversity Quotient dalam Pembelajaran</h3>
+          <p class="dropcap">Adversity Quotient (AQ) merupakan konsep yang dikembangkan oleh <strong>Paul G. Stoltz</strong> pada 1997 sebagai ukuran kemampuan individu dalam menghadapi dan mengatasi kesulitan. Stoltz mendefinisikan AQ sebagai kemampuan seseorang dalam mengamati kesulitan dan mengolahnya dengan kecerdasan yang dimiliki sehingga menjadi tantangan untuk diselesaikan.</p>
+          <p>Dalam konteks pembelajaran matematika, AQ menjadi faktor penting yang mempengaruhi bagaimana siswa merespon tantangan pembelajaran. Siswa dengan AQ tinggi cenderung memiliki persistensi yang lebih baik dalam menghadapi soal kompleks, sementara siswa dengan AQ rendah cenderung mudah menyerah.</p>
+          <h4 class="sub">Dimensi CORE dalam Adversity Quotient</h4>
+          <table>
+            <thead><tr><th style="width:24%;">Dimensi</th><th>Deskripsi</th></tr></thead>
+            <tbody>
+              <tr><td><strong>C</strong> — Control</td><td>Sejauh mana seseorang merasa mampu mengendalikan situasi sulit.</td></tr>
+              <tr><td><strong>O</strong> — Origin &amp; Ownership</td><td>Sumber kesulitan (Origin) dan tanggung jawab atas akibatnya (Ownership).</td></tr>
+              <tr><td><strong>R</strong> — Reach</td><td>Sejauh mana kesulitan mempengaruhi aspek-aspek lain kehidupan.</td></tr>
+              <tr><td><strong>E</strong> — Endurance</td><td>Persepsi tentang berapa lama kesulitan akan berlangsung.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>6<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 6 : Klasifikasi AQ (front) + Learning Obstacles (back) -->
+    <div class="leaf" data-leaf="6">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Klasifikasi</div>
+          <h3 class="section">Tiga Profil Adversity Quotient</h3>
+          <p>Berdasarkan skor AQ yang diperoleh dari <em>Adversity Response Profile</em> (ARP), siswa diklasifikasikan ke dalam tiga kelompok utama dengan karakteristik dan kebutuhan <em>scaffolding</em> yang berbeda:</p>
+          <div class="profile-grid">
+            <div class="profile-card quitter">
+              <div class="name">Quitter</div>
+              <div class="score">skor 36 – 85</div>
+              <ul>
+                <li>Mudah menyerah saat sulit</li>
+                <li>Menghindari tantangan</li>
+                <li>Motivasi belajar rendah</li>
+                <li>Kurang percaya diri</li>
+                <li>Menyalahkan faktor eksternal</li>
+              </ul>
+            </div>
+            <div class="profile-card camper">
+              <div class="name">Camper</div>
+              <div class="score">skor 86 – 125</div>
+              <ul>
+                <li>Berusaha hingga batas tertentu</li>
+                <li>Cepat puas dengan minimal</li>
+                <li>Menghindari risiko kegagalan</li>
+                <li>Motivasi sedang &amp; fluktuatif</li>
+                <li>Perlu dorongan keluar zona nyaman</li>
+              </ul>
+            </div>
+            <div class="profile-card climber">
+              <div class="name">Climber</div>
+              <div class="score">skor 126 – 144</div>
+              <ul>
+                <li>Sangat gigih, pantang menyerah</li>
+                <li>Tantangan = peluang</li>
+                <li>Motivasi intrinsik tinggi</li>
+                <li>Percaya diri pada kemampuan</li>
+                <li>Proaktif mencari solusi</li>
+              </ul>
+            </div>
+          </div>
+          <h4 class="sub">Implikasi Diferensiasi Scaffolding</h4>
+          <table>
+            <thead><tr><th>Profil</th><th>Strategi Scaffolding</th></tr></thead>
+            <tbody>
+              <tr><td><strong style="color:var(--maroon);">Quitter</strong></td><td>Procedural intensif · worked example lengkap · dukungan emosional · target bertahap</td></tr>
+              <tr><td><strong style="color:var(--gold-deep);">Camper</strong></td><td>Strategic · tantangan terstruktur bertahap · <em>metacognitive prompting</em> · justifikasi</td></tr>
+              <tr><td><strong style="color:var(--emerald-deep);">Climber</strong></td><td>Metacognitive · tantangan kompleks &amp; terbuka · <em>fading support</em> · <em>problem posing</em></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>7<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bab II · B</div>
+          <h3 class="section">Learning Obstacles dalam Matematika</h3>
+          <p>Menurut Brousseau, hambatan belajar didefinisikan sebagai <em>pengetahuan yang telah berfungsi baik pada satu konteks tertentu, namun ketika digunakan pada konteks lain, tidak dapat berfungsi atau bahkan menyebabkan kesalahan</em>.</p>
+          <p>Dalam buku panduan ini, <em>learning obstacles</em> diklasifikasikan menjadi <strong>enam jenis</strong>, yaitu hambatan ontogenik (psikologis, konseptual, prosedural, instrumental), didaktis, dan epistemologis.</p>
+          <h4 class="sub">Tabel 2.1 — Indikator Learning Obstacles</h4>
+          <table>
+            <thead><tr><th>Jenis</th><th>Indikator</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Ontogenik Psikologis</strong></td><td>Kecemasan matematika, kurang percaya diri, sikap negatif</td></tr>
+              <tr><td><strong>Ontogenik Konseptual</strong></td><td>Tidak memahami konsep dasar, gap pemahaman prasyarat</td></tr>
+              <tr><td><strong>Ontogenik Prosedural</strong></td><td>Kesalahan perhitungan, tidak bisa mengikuti langkah sistematis</td></tr>
+              <tr><td><strong>Ontogenik Instrumental</strong></td><td>Tidak bisa menggunakan rumus, kesulitan representasi visual</td></tr>
+              <tr><td><strong>Didaktis</strong></td><td>Pembelajaran terlalu prosedural, kurang konteks nyata</td></tr>
+              <tr><td><strong>Epistemologis</strong></td><td>Kesulitan dengan konsep abstrak, tidak bisa transfer pengetahuan</td></tr>
+            </tbody>
+          </table>
+          <h4 class="sub">Pola Hubungan AQ dengan LO Dominan</h4>
+          <table>
+            <thead><tr><th>Profil</th><th>LO Dominan</th><th>Siklus</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Quitter</strong></td><td>Psikologis</td><td>Cemas → Menghindar → Gagal</td></tr>
+              <tr><td><strong>Camper</strong></td><td>Konseptual + Epistemologis</td><td>Puas minimal → Tidak eksplorasi</td></tr>
+              <tr><td><strong>Climber</strong></td><td>Didaktis + Epistemologis</td><td>Bosan → Eksplorasi mandiri → Butuh tantangan</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>8<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 7 : Scaffolded Instruction (front) + Metode SCALE (back) -->
+    <div class="leaf" data-leaf="7">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Bab II · C</div>
+          <h3 class="section">Scaffolded Instruction</h3>
+          <p class="dropcap"><em>Scaffolded instruction</em> adalah strategi pengajaran di mana guru memberikan dukungan sementara kepada siswa selama proses pembelajaran. Dukungan ini secara bertahap dikurangi seiring meningkatnya kemampuan siswa. Konsep ini berakar pada teori <em>Zone of Proximal Development</em> (ZPD) yang dikembangkan oleh <strong>Lev Vygotsky</strong>.</p>
+          <p>ZPD didefinisikan sebagai jarak antara tingkat perkembangan aktual (kemampuan memecahkan masalah secara mandiri) dan tingkat perkembangan potensial (kemampuan dengan bimbingan). <em>Scaffolding</em> berfungsi sebagai jembatan yang membantu siswa bergerak dari kemampuan aktual menuju potensial mereka.</p>
+          <h4 class="sub">Lima Prinsip Scaffolded Instruction</h4>
+          <table>
+            <thead><tr><th>Prinsip</th><th>Implementasi</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Contingency</strong></td><td>Penyesuaian dukungan berdasarkan tingkat pemahaman siswa saat ini</td></tr>
+              <tr><td><strong>Fading</strong></td><td>Pengurangan dukungan secara bertahap untuk mendorong kemandirian</td></tr>
+              <tr><td><strong>Transfer of Responsibility</strong></td><td>Perpindahan tanggung jawab belajar dari guru ke siswa</td></tr>
+              <tr><td><strong>Diagnosis</strong></td><td>Identifikasi akurat terhadap kebutuhan, kesulitan, dan potensi siswa</td></tr>
+              <tr><td><strong>Intentionality</strong></td><td>Tujuan pembelajaran yang jelas dengan <em>scaffolding</em> terarah</td></tr>
+            </tbody>
+          </table>
+          <h4 class="sub">Strategi Implementasi</h4>
+          <p style="font-size: 11.5px;"><strong>Modeling</strong> (think-aloud) · <strong>Bridging</strong> (analogi) · <strong>Contextualizing</strong> (konteks relevan) · <strong>Schema Building</strong> · <strong>Metacognitive Development</strong> · <strong>Worked Examples</strong></p>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>9<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bab II · E</div>
+          <h3 class="section">Metode SCALE dalam Pembelajaran</h3>
+          <p>Metode <strong>SCALE</strong> merupakan kerangka pengembangan inovatif dari struktur dialektika Brousseau yang mengintegrasikan konstruktivisme kognitif, sosial, dan teori hambatan epistemologis. Akronim merujuk pada lima tahap sekuensial:</p>
+          <div class="callout emerald">
+            <span class="callout-title">Lima Tahap Metode SCALE</span>
+            <p style="margin: 0;"><strong>S</strong>et up goals → Penetapan tujuan dan konteks pembelajaran<br/>
+            <strong>C</strong>ontradict Adidactic → Eksplorasi mandiri dengan konflik kognitif<br/>
+            <strong>A</strong>nonymous Gallery → Berbagi hasil tanpa identitas<br/>
+            <strong>L</strong>ock-In → Formalisasi dan institusionalisasi konsep<br/>
+            <strong>E</strong>xtended → Transfer dan aplikasi ke konteks baru</p>
+          </div>
+          <h4 class="sub">Tabel 2.7 — Tahapan SCALE</h4>
+          <table>
+            <thead><tr><th>Tahap</th><th>Durasi</th><th>Kegiatan Utama</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Set up goals</strong></td><td>10–15'</td><td>Memperkenalkan konteks, mengaktifkan pengetahuan awal</td></tr>
+              <tr><td><strong>Contradict Adidactic</strong></td><td>30–40'</td><td>Eksplorasi masalah; konflik kognitif konstruktif</td></tr>
+              <tr><td><strong>Anonymous Gallery</strong></td><td>15–20'</td><td>Hasil dirotasi tanpa identitas; umpan balik anonim</td></tr>
+              <tr><td><strong>Lock-In</strong></td><td>15–25'</td><td>Institusionalisasi: merangkum, memformalkan konsep</td></tr>
+              <tr><td><strong>Extended</strong></td><td>5–10'</td><td>Transfer konsep pada konteks baru (near &amp; far)</td></tr>
+            </tbody>
+          </table>
+          <h4 class="sub">Diferensiasi SCALE Berdasarkan AQ</h4>
+          <table>
+            <thead><tr><th>Tahap</th><th>Quitter</th><th>Camper</th><th>Climber</th></tr></thead>
+            <tbody>
+              <tr><td>Set up</td><td>Familiar, sederhana</td><td>Menantang bertahap</td><td>Kompleks &amp; terbuka</td></tr>
+              <tr><td>Contradict</td><td>Terbimbing + WE</td><td>Semi-mandiri + hint</td><td>Mandiri penuh</td></tr>
+              <tr><td>Lock-In</td><td>Eksplisit</td><td>Koneksi konsep</td><td>Justifikasi mandiri</td></tr>
+              <tr><td>Extended</td><td>Near sederhana</td><td>Near &amp; far</td><td>Far + problem posing</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>10<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 8 : BAB III divider (front) + Penentuan AQ (back) -->
+    <div class="leaf" data-leaf="8">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="chapter-divider">
+            <div class="roman">III</div>
+            <div class="label">Bab Ketiga</div>
+            <h1>Identifikasi &amp;<br/>Pengelompokan</h1>
+            <div class="ornament-rule"><span class="line"></span><span class="glyph">❖</span><span class="line"></span></div>
+            <p class="summary">Prosedur lengkap mengidentifikasi dan mengelompokkan siswa berdasarkan profil <em>Adversity Quotient</em> dan <em>learning obstacles</em>.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>11<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bab III · A</div>
+          <h3 class="section">Penentuan Adversity Quotient Siswa</h3>
+          <p>Penentuan level AQ dilakukan menggunakan <strong>Angket AQ Terintegrasi Numerasi</strong> yang terdiri dari <strong>36 butir pernyataan</strong> mengukur empat dimensi CORE dengan konteks numerasi aljabar.</p>
+          <h4 class="sub">Tabel 3.1 — Struktur Angket AQ</h4>
+          <table>
+            <thead><tr><th>Dimensi</th><th>Butir</th><th>Aspek Diukur</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Control (C)</strong></td><td>9 (1–9)</td><td>Kemampuan mengendalikan respons terhadap kesulitan</td></tr>
+              <tr><td><strong>Ownership (O)</strong></td><td>9 (10–18)</td><td>Tanggung jawab atas proses belajar numerasi</td></tr>
+              <tr><td><strong>Reach (R)</strong></td><td>9 (19–27)</td><td>Kemampuan membatasi jangkauan dampak kesulitan</td></tr>
+              <tr><td><strong>Endurance (E)</strong></td><td>9 (28–36)</td><td>Daya tahan dan persistensi menghadapi tantangan</td></tr>
+              <tr><td colspan="2"><strong>TOTAL</strong></td><td><strong>Skor maksimal: 144 poin</strong></td></tr>
+            </tbody>
+          </table>
+          <h4 class="sub">Sistem Penskoran (Skala Likert 1–4)</h4>
+          <table>
+            <thead><tr><th>Respons</th><th>Pernyataan Positif</th><th>Pernyataan Negatif</th></tr></thead>
+            <tbody>
+              <tr><td>Tidak Pernah</td><td>1 poin</td><td>4 poin (reverse)</td></tr>
+              <tr><td>Jarang</td><td>2 poin</td><td>3 poin (reverse)</td></tr>
+              <tr><td>Sering</td><td>3 poin</td><td>2 poin (reverse)</td></tr>
+              <tr><td>Selalu</td><td>4 poin</td><td>1 poin (reverse)</td></tr>
+            </tbody>
+          </table>
+          <h4 class="sub">Klasifikasi Level AQ</h4>
+          <table>
+            <thead><tr><th>%</th><th>Skor</th><th>Kategori</th><th>Tindak Lanjut</th></tr></thead>
+            <tbody>
+              <tr><td>&lt; 60%</td><td>0–85</td><td><strong style="color:var(--maroon);">QUITTER</strong></td><td>Procedural intensif</td></tr>
+              <tr><td>60–79%</td><td>86–125</td><td><strong style="color:var(--gold-deep);">CAMPER</strong></td><td>Strategic terstruktur</td></tr>
+              <tr><td>≥ 80%</td><td>126–144</td><td><strong style="color:var(--emerald-deep);">CLIMBER</strong></td><td>Metacognitive terbuka</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>12<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 9 : Identifikasi LO (front) + Profil Quitter (back) -->
+    <div class="leaf" data-leaf="9">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Bab III · B</div>
+          <h3 class="section">Identifikasi Learning Obstacles</h3>
+          <p>Setelah pengelompokan AQ, langkah berikutnya adalah mengidentifikasi <em>learning obstacles</em> melalui <strong>tes diagnostik numerasi</strong>: dua soal uraian kontekstual yang dirancang untuk mengungkap enam jenis hambatan belajar.</p>
+          <h4 class="sub">Tabel 3.5 — Spesifikasi Soal Diagnostik</h4>
+          <table>
+            <thead><tr><th>№</th><th>Konteks</th><th>Aspek</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1</strong></td><td>Operasi Drone Pengangkut Air</td><td>Pemodelan SPtLDV, manipulasi aljabar, representasi grafis, interpretasi kontekstual</td></tr>
+              <tr><td><strong>2</strong></td><td>Optimalisasi Drone Sprayer Pupuk</td><td>Formulasi kendala, daerah feasible, evaluasi solusi optimal</td></tr>
+            </tbody>
+          </table>
+          <h4 class="sub">Tabel 3.6 — Rubrik Identifikasi LO</h4>
+          <table>
+            <thead><tr><th>Jenis</th><th>Indikator dalam Hasil Pekerjaan</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Psikologis</strong></td><td>Lembar kosong, menyerah sebelum mencoba, tidak ada usaha sistematis</td></tr>
+              <tr><td><strong>Konseptual</strong></td><td>Hanya satu pertidaksamaan, tidak membedakan persamaan vs pertidaksamaan</td></tr>
+              <tr><td><strong>Prosedural</strong></td><td>Kesalahan manipulasi aljabar, tidak membalik tanda saat dibagi negatif</td></tr>
+              <tr><td><strong>Instrumental</strong></td><td>Tidak dapat mengkonversi soal cerita ke model matematis</td></tr>
+              <tr><td><strong>Didaktis</strong></td><td>Prosedur fragmentaris tanpa urutan logis, hafalan tanpa pemahaman</td></tr>
+              <tr><td><strong>Epistemologis</strong></td><td>Tidak ada interpretasi kontekstual, tidak menyadari konteks</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>13<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bab III · C</div>
+          <h3 class="section">Profil <em style="color:var(--maroon);">Quitter</em></h3>
+          <p>Kelompok Quitter (skor AQ 0–86) menunjukkan hambatan komprehensif dan parah pada semua dimensi. <strong>Hambatan psikologis menjadi penghalang utama</strong> yang memperkuat semua hambatan lainnya.</p>
+          <div class="callout">
+            <span class="callout-title">Profil Learning Obstacles: Quitter</span>
+            <ul style="margin-bottom: 0;">
+              <li><strong>Psikologis (DOMINAN)</strong> — Kecemasan tinggi, <em>learned helplessness</em>, <em>fixed mindset</em></li>
+              <li><strong>Konseptual</strong> — Tidak memahami konsep sistem, hanya simbol tanpa makna</li>
+              <li><strong>Prosedural</strong> — Tidak menguasai manipulasi aljabar dan grafik</li>
+              <li><strong>Instrumental</strong> — Tidak dapat translasi verbal-matematis</li>
+              <li><strong>Didaktis</strong> — Pembelajaran terlalu cepat, tidak ada diferensiasi</li>
+              <li><strong>Epistemologis</strong> — Kesulitan interpretasi hasil dalam konteks</li>
+            </ul>
+          </div>
+          <h4 class="sub">Temuan Hambatan Psikologis Quitter</h4>
+          <table>
+            <thead><tr><th>Tema</th><th>Temuan dari Wawancara</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Kecemasan</strong></td><td>"Rasanya mau menyerah saja dari awal."</td></tr>
+              <tr><td><strong>Learned Helplessness</strong></td><td>"Saya memang tidak bisa."</td></tr>
+              <tr><td><strong>Motivasi Rendah</strong></td><td>"Untuk apa belajar ini?"</td></tr>
+              <tr><td><strong>Tidak Ada Sukses</strong></td><td>"Tidak pernah berhasil."</td></tr>
+            </tbody>
+          </table>
+          <div class="callout emerald">
+            <span class="callout-title">Sintesis Scaffolding Quitter</span>
+            <ul style="margin-bottom: 0;">
+              <li>Prioritaskan intervensi <strong>psikologis</strong> sebelum kognitif</li>
+              <li>Pengalaman keberhasilan kecil untuk membangun kepercayaan diri</li>
+              <li>Procedural Scaffolding dengan langkah sangat eksplisit</li>
+              <li><em>Worked examples</em> lengkap, <em>wait time</em> 10–12 detik</li>
+              <li>Dukungan emosional konsisten · hindari kritik negatif</li>
+            </ul>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>14<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 10 : Profil Camper (front) + Profil Climber & Matriks (back) -->
+    <div class="leaf" data-leaf="10">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Bab III · D</div>
+          <h3 class="section">Profil <em style="color:var(--gold-deep);">Camper</em></h3>
+          <p>Kelompok Camper (skor 87–115) menunjukkan pola hambatan yang berbeda secara <em>kualitatif</em> dari Quitter. Hambatan mereka bukan karena ketidakmampuan fundamental, tetapi karena <strong>mentalitas "cukup baik"</strong> yang membatasi diri pada standar minimal.</p>
+          <div class="callout">
+            <span class="callout-title">Profil LO: Camper</span>
+            <ul style="margin-bottom: 0;">
+              <li><strong>Psikologis</strong> — Mentalitas "cukup baik", motivasi ekstrinsik, zona nyaman</li>
+              <li><strong>Konseptual</strong> — Memadai untuk standar, tidak mendalami teoretis</li>
+              <li><strong>Prosedural</strong> — Menguasai dasar, kesulitan dengan soal non-rutin</li>
+              <li><strong>Didaktis</strong> — Pembelajaran berorientasi pola ujian</li>
+              <li><strong>Epistemologis</strong> — Kesadaran ada tetapi tidak dieksplor</li>
+            </ul>
+          </div>
+          <h4 class="sub">Temuan Khas Camper</h4>
+          <table>
+            <thead><tr><th>Tema</th><th>Quote</th></tr></thead>
+            <tbody>
+              <tr><td><strong>"Cukup Baik"</strong></td><td>"Tidak perlu terlalu dalam"</td></tr>
+              <tr><td><strong>Motivasi Ekstrinsik</strong></td><td>"Untuk lulus dan dapat nilai"</td></tr>
+              <tr><td><strong>Pemahaman Terbatas</strong></td><td>"Tidak tahu alasan teorinya, tapi tahu aturannya"</td></tr>
+            </tbody>
+          </table>
+          <div class="callout emerald">
+            <span class="callout-title">Sintesis Scaffolding Camper</span>
+            <ul style="margin-bottom: 0;">
+              <li>Mengubah mentalitas dari "cukup baik" → orientasi keunggulan</li>
+              <li>Kembangkan motivasi intrinsik melalui tantangan bermakna</li>
+              <li><strong>Strategic Scaffolding</strong> dengan <em>metacognitive prompts</em></li>
+              <li>Dorong justifikasi <em>"karena…"</em> untuk setiap langkah</li>
+              <li>Hubungkan antar-konsep untuk pemahaman relasional</li>
+            </ul>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>15<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bab III · E–F</div>
+          <h3 class="section">Profil <em style="color:var(--emerald-deep);">Climber</em></h3>
+          <p>Kelompok Climber (skor 116–144) menunjukkan profil pembelajaran yang sangat positif dengan <strong>hambatan minimal</strong>. Jika ada "hambatan", itu adalah keterbatasan akses terhadap materi dan tantangan yang lebih lanjut.</p>
+          <div class="callout emerald">
+            <span class="callout-title">Karakteristik Positif Climber</span>
+            <ul style="margin-bottom: 0;">
+              <li><strong>Psikologis</strong> — "Sangat menarik, saya tertantang" — motivasi intrinsik tinggi</li>
+              <li><strong>Konseptual</strong> — "Irisan dari semua daerah" — pemahaman mendalam</li>
+              <li><strong>Prosedural</strong> — Penguasaan dengan pemahaman teoretis</li>
+              <li><strong>Instrumental</strong> — Koordinasi multi-representasi superior</li>
+              <li><strong>Epistemologis</strong> — Pemahaman validasi model sangat baik</li>
+            </ul>
+          </div>
+          <h3 class="section" style="margin-top: 16px;">Matriks Perbandingan LO</h3>
+          <table>
+            <thead><tr><th>Jenis LO</th><th>Quitter</th><th>Camper</th><th>Climber</th></tr></thead>
+            <tbody>
+              <tr><td>Psikologis</td><td><span style="color:var(--maroon);">PARAH</span></td><td>SEDANG</td><td><span style="color:var(--emerald);">—</span></td></tr>
+              <tr><td>Konseptual</td><td><span style="color:var(--maroon);">PARAH</span></td><td>RINGAN</td><td><span style="color:var(--emerald);">—</span></td></tr>
+              <tr><td>Prosedural</td><td><span style="color:var(--maroon);">PARAH</span></td><td>RINGAN</td><td><span style="color:var(--emerald);">—</span></td></tr>
+              <tr><td>Instrumental</td><td><span style="color:var(--maroon);">PARAH</span></td><td>SEDANG</td><td><span style="color:var(--emerald);">—</span></td></tr>
+              <tr><td>Didaktis</td><td><span style="color:var(--maroon);">PARAH</span></td><td>SEDANG</td><td>RINGAN</td></tr>
+              <tr><td>Epistemologis</td><td><span style="color:var(--maroon);">PARAH</span></td><td>SEDANG</td><td><span style="color:var(--emerald);">—</span></td></tr>
+            </tbody>
+          </table>
+          <div class="callout">
+            <span class="callout-title">Sintesis Scaffolding Climber</span>
+            <ul style="margin-bottom: 0;">
+              <li><strong>Metacognitive Scaffolding</strong> dengan tantangan terbuka</li>
+              <li><em>Fading Support</em> — kurangi bantuan secara bertahap</li>
+              <li>Investigasi mandiri, <em>problem posing</em>, multi-kriteria</li>
+              <li>Akses ke materi lanjutan (ekstensi 3+ variabel)</li>
+              <li>Dorong <em>peer tutoring</em> untuk membantu kelompok lain</li>
+            </ul>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>16<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 11 : BAB IV divider (front) + Struktur 8 Pertemuan (back) -->
+    <div class="leaf" data-leaf="11">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="chapter-divider">
+            <div class="roman">IV</div>
+            <div class="label">Bab Keempat</div>
+            <h1>Implementasi<br/>Desain Didaktis</h1>
+            <div class="ornament-rule"><span class="line"></span><span class="glyph">❖</span><span class="line"></span></div>
+            <p class="summary">Delapan pertemuan terintegrasi: empat Situasi Didaktis berselang-seling dengan empat Tes Numerasi Berjenjang, menggunakan metode SCALE.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>17<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bab IV · A</div>
+          <h3 class="section">Struktur 8 Pertemuan</h3>
+          <p>Implementasi desain didaktis disusun dalam 8 pertemuan yang terintegrasi. Setiap Situasi Didaktis (pertemuan ganjil) diikuti oleh Tes Numerasi Berjenjang (pertemuan genap) untuk evaluasi formatif berkelanjutan dan penyesuaian <em>scaffolding</em>.</p>
+          <table>
+            <thead><tr><th>Pertemuan</th><th>Jenis</th><th>Fokus Materi</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1</strong></td><td>Situasi Didaktis 1</td><td>Konsep Dasar SPtLDV — Konteks Jajanan Kantin</td></tr>
+              <tr><td><strong>2</strong></td><td>Tes Numerasi 1</td><td>Pemodelan SPtLDV dan Verifikasi Solusi</td></tr>
+              <tr><td><strong>3</strong></td><td>Situasi Didaktis 2</td><td>Representasi Grafis — Konteks Usaha Fotokopi</td></tr>
+              <tr><td><strong>4</strong></td><td>Tes Numerasi 2</td><td>Grafik dan Daerah Penyelesaian SPtLDV</td></tr>
+              <tr><td><strong>5</strong></td><td>Situasi Didaktis 3</td><td>Klasifikasi Daerah (Terbatas/Tak Terbatas/Kosong)</td></tr>
+              <tr><td><strong>6</strong></td><td>Tes Numerasi 3</td><td>Operasi dan Perubahan Tanda Pertidaksamaan</td></tr>
+              <tr><td><strong>7</strong></td><td>Situasi Didaktis 4</td><td>Integrasi Komprehensif — Optimasi Toko Roti</td></tr>
+              <tr><td><strong>8</strong></td><td>Tes Numerasi 4</td><td>Optimalisasi: Maksimisasi dan Minimisasi (Sumatif)</td></tr>
+            </tbody>
+          </table>
+          <h4 class="sub">Pemetaan LO ke Target Situasi Didaktis</h4>
+          <table>
+            <thead><tr><th>Kode</th><th>Profil</th><th>Target SD</th></tr></thead>
+            <tbody>
+              <tr><td><strong>LO-01</strong></td><td>Quitter (Epistemologis)</td><td>SD1: Bedakan persamaan vs pertidaksamaan</td></tr>
+              <tr><td><strong>LO-03</strong></td><td>Quitter (Psikologis)</td><td>SD1–SD3: Atasi kecemasan matematis</td></tr>
+              <tr><td><strong>LO-07</strong></td><td>Camper (Epistemologis)</td><td>SD1: Justifikasi konseptual prosedur</td></tr>
+              <tr><td><strong>LO-10</strong></td><td>Camper (Konseptual)</td><td>SD2: Koneksi multi-representasi</td></tr>
+              <tr><td><strong>LO-14</strong></td><td>Climber (Didaktis)</td><td>SD1–SD4: Tantangan memadai mencegah <em>plateau</em></td></tr>
+              <tr><td><strong>LO-18</strong></td><td>Climber (Instrumental)</td><td>SD4: Desmos untuk eksplorasi kompleks</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>18<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 12 : Pertemuan 1 SD1 (front) + Pertemuan 2 Tes 1 (back) -->
+    <div class="leaf" data-leaf="12">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Pertemuan 1 · 88 menit</div>
+          <h3 class="section">SD1 — Konsep Dasar SPtLDV</h3>
+          <p class="lead">Konteks: <strong>Jajanan Kantin</strong> — familiar bagi siswa, memungkinkan eksplorasi natural konsep "tepat" vs "maksimal".</p>
+          <p>SD1 bertujuan membangun pemahaman konseptual tentang perbedaan fundamental antara <strong>persamaan</strong> dan <strong>pertidaksamaan</strong> linear dua variabel.</p>
+          <div class="callout emerald">
+            <span class="callout-title">Fase SCALE — Situasi Didaktis 1</span>
+            <p style="margin: 0; font-size: 11px; line-height: 1.6;"><strong>S</strong>et up (15') — Dua situasi kontras: <em>"habiskan tepat 10rb"</em> vs <em>"maksimal 10rb"</em><br/>
+            <strong>C</strong>ontradict (30') — Eksplorasi dengan <em>scaffolding</em> berdiferensiasi<br/>
+            <strong>A</strong>nonymous Gallery (15') — Hasil tanpa nama (kode warna), <em>peer feedback</em><br/>
+            <strong>L</strong>ock-In (15') — Ko-konstruksi: urutan Quitter→Camper→Climber<br/>
+            <strong>E</strong>xtended (13') — Transfer: <em>"Tepat 15 poin dengan tembakan 2 atau 3 poin"</em></p>
+          </div>
+          <h4 class="sub">Tabel 4.4 — Scaffolding Berdiferensiasi SD1</h4>
+          <table>
+            <thead><tr><th>Profil</th><th>Strategi Spesifik</th></tr></thead>
+            <tbody>
+              <tr><td><strong style="color:var(--maroon);">Quitter</strong></td><td><em>Worked example</em> lengkap, panduan <em>step-by-step</em>, validasi <em>peer</em>, <em>wait time</em> 10+ detik</td></tr>
+              <tr><td><strong style="color:var(--gold-deep);">Camper</strong></td><td>Kerangka 4-langkah, pertanyaan "mengapa", justifikasi tertulis wajib</td></tr>
+              <tr><td><strong style="color:var(--emerald-deep);">Climber</strong></td><td>Pertanyaan perluasan, eksplorasi pola, sistem batasan berganda</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size: 11.5px;"><em>Implikasi pedagogis:</em> konteks familiar efektif menurunkan kecemasan; <em>scaffolding</em> berdiferensiasi terbukti valid; keanoniman dalam Anonymous Gallery menciptakan keamanan psikologis.</p>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>19<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Pertemuan 2 · 70 menit</div>
+          <h3 class="section">Tes Numerasi 1 — Pemodelan &amp; Verifikasi</h3>
+          <p>Tes Numerasi 1 mengukur capaian SD1 dengan fokus pada konsep dasar dan pemodelan SPtLDV. Disusun dalam 3 level berdasarkan kompleksitas kognitif untuk diferensiasi penilaian.</p>
+          <table>
+            <thead><tr><th>Level</th><th>Soal</th><th>Fokus</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Level 1</strong> — Pemula</td><td>10</td><td>Konsep dasar, pemodelan sederhana, verifikasi titik solusi</td></tr>
+              <tr><td><strong>Level 2</strong> — Menengah</td><td>10</td><td>Sistem pertidaksamaan, multi-batasan, verifikasi kompleks</td></tr>
+              <tr><td><strong>Level 3</strong> — Lanjut</td><td>10</td><td>Konteks kompleks, batasan berganda, pemodelan terintegrasi</td></tr>
+            </tbody>
+          </table>
+          <div class="callout">
+            <span class="callout-title">Contoh Soal Tes Numerasi 1</span>
+            <p style="margin: 0; font-size: 11px;"><strong>LEVEL 1.</strong> Sebuah kafe menjual kopi (x cangkir) dan teh (y cangkir). Kopi Rp 20.000 dan teh Rp 15.000. Jika target penjualan minimal Rp 300.000, model matematika yang tepat:<br/>
+            (A) 20000x + 15000y ≤ 300000  &nbsp;&nbsp; (B) <strong>20000x + 15000y ≥ 300000</strong></p>
+            <p style="margin: 6px 0 0 0; font-size: 11px;"><strong>LEVEL 2.</strong> Petani menanam jagung (x ha) dan kedelai (y ha). Lahan 10 ha. Biaya jagung Rp 5jt/ha, kedelai Rp 4jt/ha. Modal maksimal Rp 45jt. Tentukan sistem pertidaksamaannya.</p>
+            <p style="margin: 6px 0 0 0; font-size: 11px;"><strong>LEVEL 3.</strong> Catering paket A &amp; B dengan batasan daging, sayur, dan waktu. Apakah pasangan (20, 40) memenuhi sistem: 0,5x + 0,3y ≤ 30; 0,4x + 0,6y ≤ 36; 15x + 20y ≤ 240?</p>
+          </div>
+          <p style="font-size: 11.5px;">Tes ini memungkinkan diferensiasi penilaian: Quitter ditargetkan menyelesaikan Level 1 (≥70%), Camper hingga Level 2 (≥70%), dan Climber hingga Level 3 (≥70%).</p>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>20<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 13 : Pertemuan 3 SD2 (front) + Pertemuan 4 Tes 2 (back) -->
+    <div class="leaf" data-leaf="13">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Pertemuan 3 · 90 menit</div>
+          <h3 class="section">SD2 — Representasi Grafis</h3>
+          <p class="lead">Konteks: <strong>Usaha Fotokopi</strong> — model linear y = 100x − 500.000 mengkonkretkan konsep bilangan positif (untung) dan negatif (rugi).</p>
+          <p>SD2 memfasilitasi transisi kognitif siswa dari pemahaman <em>tabuler-numerik</em> menuju <em>representasi grafis</em> kompleks, diperkuat dengan kemampuan interpretasi lintas kuadran.</p>
+          <div class="callout emerald">
+            <span class="callout-title">Fase SCALE — Situasi Didaktis 2</span>
+            <p style="margin: 0; font-size: 11px; line-height: 1.6;"><strong>S</strong> (15') — Aktivasi SD1 + introduksi grafis (untung/rugi)<br/>
+            <strong>C</strong> (30') — Quitter: 5 langkah eksplisit + tabel; Camper: bangun model sendiri + analisis multi-kuadran; Climber: pemodelan multi-batasan + <em>problem posing</em><br/>
+            <strong>A</strong> (12') — Berbagi hasil dengan <em>checklist</em> evaluasi<br/>
+            <strong>L</strong> (15') — Framework multi-kuadran: Kuadran I (valid), II–III (tidak valid)<br/>
+            <strong>E</strong> (18') — Transfer: suhu, rekening bank, ketinggian</p>
+          </div>
+          <h4 class="sub">LO Prioritas SD2</h4>
+          <table>
+            <thead><tr><th>Kode</th><th>Profil</th><th>Strategi Resolusi</th></tr></thead>
+            <tbody>
+              <tr><td><strong>LO-04</strong></td><td>Quitter</td><td>Alat bantu grafik berkode warna (hijau=valid, merah=tidak)</td></tr>
+              <tr><td><strong>LO-10</strong></td><td>Camper</td><td>Pertanyaan metakognitif untuk koneksi multi-representasi</td></tr>
+              <tr><td><strong>LO-14</strong></td><td>Climber</td><td>Batasan berganda dan <em>problem posing</em> mandiri</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size: 11.5px;"><em>Temuan kunci:</em> "tabel sebagai jembatan" efektif untuk transisi representasi; pemodelan mandiri meningkatkan kedalaman pemahaman; <em>checklist</em> membuat <em>peer review</em> lebih substantif.</p>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>21<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Pertemuan 4 · 70 menit</div>
+          <h3 class="section">Tes Numerasi 2 — Grafik &amp; Daerah</h3>
+          <p>Mengukur kemampuan siswa menggambar grafik, mengidentifikasi daerah penyelesaian, dan menginterpretasi solusi dalam konteks.</p>
+          <table>
+            <thead><tr><th>Level</th><th>Soal</th><th>Fokus</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Level 1</strong></td><td>10</td><td>Titik potong sumbu, daerah penyelesaian dasar, garis batas</td></tr>
+              <tr><td><strong>Level 2</strong></td><td>10</td><td>Aplikasi grafis dalam konteks nyata, titik pojok, bentuk daerah</td></tr>
+              <tr><td><strong>Level 3</strong></td><td>10</td><td>Sistem kompleks, analisis grafis mendalam, multi-batasan</td></tr>
+            </tbody>
+          </table>
+          <div class="callout">
+            <span class="callout-title">Contoh Soal Tes Numerasi 2</span>
+            <p style="margin: 0; font-size: 11px;"><strong>LEVEL 1.</strong> Garis batas dari pertidaksamaan 2x + y ≤ 8 memotong sumbu-x di titik:<br/>
+            (A) (8, 0)  &nbsp; (B) <strong>(4, 0)</strong>  &nbsp; (C) (0, 4)  &nbsp; (D) (2, 0)</p>
+            <p style="margin: 6px 0 0 0; font-size: 11px;"><strong>LEVEL 2.</strong> Petani memiliki lahan untuk jagung (x ha) dan kedelai (y ha). Lahan maksimal 6 ha. Dengan x ≥ 0, y ≥ 0, tentukan titik pojok daerah penyelesaian sistem x + y ≤ 6.</p>
+            <p style="margin: 6px 0 0 0; font-size: 11px;"><strong>LEVEL 3.</strong> Toko gadget menjual laptop dan tablet dengan batasan ruang display dan modal. Identifikasi bentuk daerah penyelesaian dan titik-titik pojoknya.</p>
+          </div>
+          <p style="font-size: 11.5px;">Soal dirancang dengan progresi yang memungkinkan setiap profil AQ mencapai zona pertumbuhan optimal mereka.</p>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>22<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 14 : Pertemuan 5 SD3 (front) + Pertemuan 6 Tes 3 (back) -->
+    <div class="leaf" data-leaf="14">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Pertemuan 5 · 90 menit</div>
+          <h3 class="section">SD3 — Klasifikasi Daerah Penyelesaian</h3>
+          <p class="lead">Tiga skenario kontras: <strong>liburan</strong> (terbatas) · <strong>target belajar</strong> (tak terbatas) · <strong>jadwal tugas</strong> (kosong).</p>
+          <p>SD3 membangun pemahaman tentang tiga jenis daerah penyelesaian — terbatas, tak terbatas, dan kosong. Konteks perencanaan digunakan untuk mengkonkretkan konsep abstrak tentang konsistensi batasan.</p>
+          <div class="callout emerald">
+            <span class="callout-title">Fase SCALE — Situasi Didaktis 3</span>
+            <p style="margin: 0; font-size: 11px; line-height: 1.6;"><strong>S</strong> (15') — Konflik kognitif dengan 3 skenario kontras<br/>
+            <strong>C</strong> (30') — Quitter: contoh terstruktur + stabilo 3 warna; Camper: protokol 4 langkah + metakognitif; Climber: analisis sensitivitas + generalisasi n variabel<br/>
+            <strong>A</strong> (20') — <em>Cross-fertilization</em>: setiap profil belajar dari profil lain<br/>
+            <strong>L</strong> (15') — Ko-konstruksi tabel komparatif tiga jenis daerah<br/>
+            <strong>E</strong> (10') — Transfer: OSIS Bazar dan Jadwal Kosong</p>
+          </div>
+          <h4 class="sub">Sistem Stabilo 3 Warna (Inisiatif Mandiri Siswa!)</h4>
+          <table>
+            <thead><tr><th>Daerah</th><th>Warna</th><th>Kriteria</th></tr></thead>
+            <tbody>
+              <tr><td><strong>TERBATAS</strong></td><td><span style="color:var(--emerald-deep);font-weight:bold;">HIJAU</span></td><td>Semua variabel memiliki batasan max DAN min konsisten</td></tr>
+              <tr><td><strong>TAK TERBATAS</strong></td><td><span style="color:#1e5b8a;font-weight:bold;">BIRU</span></td><td>Ada variabel tanpa batasan atas atau bawah</td></tr>
+              <tr><td><strong>KOSONG</strong></td><td><span style="color:var(--maroon);font-weight:bold;">MERAH</span></td><td>Batasan saling bertentangan (min &gt; max)</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size: 11.5px;"><em>Temuan penting:</em> strategi stabilo 3 warna muncul sebagai inisiatif mandiri siswa, bukan instruksi guru — menunjukkan keterlibatan kognitif yang sehat.</p>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>23<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Pertemuan 6 · 70 menit</div>
+          <h3 class="section">Tes Numerasi 3 — Operasi &amp; Jenis Solusi</h3>
+          <p>Mengukur pemahaman tentang <strong>operasi pertidaksamaan</strong>, khususnya aturan perubahan tanda saat operasi dengan bilangan negatif, serta klasifikasi jenis daerah penyelesaian.</p>
+          <table>
+            <thead><tr><th>Level</th><th>Soal</th><th>Fokus</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Level 1</strong></td><td>10</td><td>Operasi dasar, perubahan tanda dengan bilangan negatif</td></tr>
+              <tr><td><strong>Level 2</strong></td><td>10</td><td>Jenis solusi: terbatas, tak terbatas, tidak ada solusi</td></tr>
+              <tr><td><strong>Level 3</strong></td><td>10</td><td>Analisis sistem kompleks, identifikasi konflik batasan</td></tr>
+            </tbody>
+          </table>
+          <div class="callout">
+            <span class="callout-title">Contoh Soal Tes Numerasi 3</span>
+            <p style="margin: 0; font-size: 11px;"><strong>LEVEL 1.</strong> Siswa memiliki uang saku x minimal Rp 50.000: x ≥ 50000. Ketika kedua ruas dikalikan −1, pertidaksamaan menjadi:<br/>
+            (A) −x ≥ −50000 &nbsp; (B) <strong>−x ≤ −50000 (tanda berubah)</strong></p>
+            <p style="margin: 6px 0 0 0; font-size: 11px;"><strong>LEVEL 2.</strong> Sistem: x + y ≤ 10; x ≥ 2; y ≥ 3. Daerah penyelesaian bersifat:<br/>
+            (A) <strong>Terbatas</strong> &nbsp; (B) Tak terbatas &nbsp; (C) Kosong</p>
+            <p style="margin: 6px 0 0 0; font-size: 11px;"><strong>LEVEL 3.</strong> Waktu belajar tersedia 12 jam. Matematika minimal 8 jam, Fisika minimal 6 jam. Identifikasi jenis daerah dan berikan saran perbaikan jika diperlukan.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>24<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 15 : Pertemuan 7 SD4 (front) + Pertemuan 8 Tes 4 + Sintesis (back) -->
+    <div class="leaf" data-leaf="15">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Pertemuan 7 · 80 menit</div>
+          <h3 class="section">SD4 — Integrasi Komprehensif</h3>
+          <p class="lead">Konteks: <strong>Optimasi Toko Roti</strong> — Roti Tawar (modal Rp 12.000, untung Rp 8.000) &amp; Roti Cokelat (modal Rp 18.000, untung Rp 12.000). Modal Rp 150.000, kapasitas oven 10 loyang.</p>
+          <p>SD4 merupakan <strong>kulminasi pembelajaran</strong> yang mengintegrasikan semua konsep SD1–SD3. Tujuan utamanya: menguji kemampuan siswa untuk bekerja mandiri dengan <em>scaffolding minimal</em>.</p>
+          <div class="callout emerald">
+            <span class="callout-title">Fase SCALE — Situasi Didaktis 4</span>
+            <p style="margin: 0; font-size: 11px; line-height: 1.6;"><strong>S</strong> (15') — Aktivasi pembelajaran terpadu SD1–SD3<br/>
+            <strong>C</strong> (28') — Quitter: <em>checklist</em> tanpa <em>worked example</em>; Camper: multi-strategi (Desmos + aljabar); Climber: <em>Desmos slider</em> untuk analisis sensitivitas multi-kriteria<br/>
+            <strong>A</strong> (15') — Refleksi pembelajaran keseluruhan, apresiasi strategi berbeda<br/>
+            <strong>L</strong> (12') — Formalisasi: metode titik sudut + <em>binding constraints</em><br/>
+            <strong>E</strong> (10') — Transfer: pabrik mebel (kursi dan meja)</p>
+          </div>
+          <h4 class="sub">Transformasi Pembelajaran SD1 → SD4</h4>
+          <table>
+            <thead><tr><th>Profil</th><th>SD1 (Awal)</th><th>SD4 (Akhir)</th></tr></thead>
+            <tbody>
+              <tr><td><strong style="color:var(--maroon);">Quitter</strong></td><td>Takut mulai tanpa contoh, ketergantungan tinggi</td><td>Mandiri penuh dengan <em>checklist</em>, kepercayaan diri tinggi</td></tr>
+              <tr><td><strong style="color:var(--gold-deep);">Camper</strong></td><td>Tahu cara tanpa alasan, prosedural</td><td><em>Inquiry mindset</em>, multi-strategi, verifikasi mandiri</td></tr>
+              <tr><td><strong style="color:var(--emerald-deep);">Climber</strong></td><td>Cepat selesai tapi dangkal</td><td>Pemikiran strategis, <em>binding constraints</em>, multi-kriteria</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>25<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Pertemuan 8 · 70 menit</div>
+          <h3 class="section">Tes Numerasi 4 — Optimalisasi (Sumatif)</h3>
+          <p>Evaluasi sumatif yang mengukur capaian pembelajaran keseluruhan. Soal menguji kemampuan menemukan nilai maksimum/minimum fungsi objektif dengan batasan-batasan yang diberikan.</p>
+          <div class="callout">
+            <span class="callout-title">Contoh Soal Tes Numerasi 4</span>
+            <p style="margin: 0; font-size: 11px;"><strong>LEVEL 1.</strong> Pedagang buah menjual apel (x kg) Rp 15.000/kg dan jeruk (y kg) Rp 12.000/kg. Fungsi total pendapatan:<br/>
+            (A) P = 12.000x + 15.000y &nbsp; (B) <strong>P = 15.000x + 12.000y</strong></p>
+            <p style="margin: 6px 0 0 0; font-size: 11px;"><strong>LEVEL 2.</strong> Toko kue: brownies Rp 40.000/box, cookies Rp 25.000/box. Titik pojok: (0,0), (10,0), (6,8), (0,12). Tentukan pendapatan maksimum.</p>
+            <p style="margin: 6px 0 0 0; font-size: 11px;"><strong>LEVEL 3.</strong> Pabrik furniture: kursi (untung Rp 150.000) dan meja (untung Rp 200.000) dengan batasan kayu &amp; tenaga kerja. Tentukan produksi optimal dan analisis batasan mana yang mengikat (<em>binding constraint</em>).</p>
+          </div>
+          <h3 class="section" style="margin-top: 14px;">Sintesis Implementasi</h3>
+          <h4 class="sub">Status Resolusi Learning Obstacles</h4>
+          <table>
+            <thead><tr><th>Profil</th><th>Status</th><th>Bukti Kunci</th></tr></thead>
+            <tbody>
+              <tr><td><strong>QUITTER</strong></td><td>Substansial</td><td>Kemandirian di SD4, kecemasan menurun</td></tr>
+              <tr><td><strong>CAMPER</strong></td><td>Kuat</td><td>Justifikasi spontan, <em>inquiry mindset</em></td></tr>
+              <tr><td><strong>CLIMBER</strong></td><td>Sangat Kuat</td><td><em>Plateau</em> tercegah, <em>Desmos slider</em>, <em>binding constraints</em></td></tr>
+            </tbody>
+          </table>
+          <p style="font-size: 11.5px;"><em>Implikasi:</em> <em>scaffolding</em> berdiferensiasi efektif untuk semua profil; konteks autentik mengurangi kecemasan; metode SCALE memfasilitasi progresi terstruktur; Anonymous Gallery menciptakan keamanan psikologis.</p>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>26<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 16: BAB V Divider + Soal Diagnostik -->
+    <div class="leaf" data-leaf="16">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="chapter-divider">
+            <div class="roman">V</div>
+            <div class="label">Bab Kelima</div>
+            <h1>Instrumen Penelitian</h1>
+            <div class="ornament-rule"><span class="line"></span><span class="glyph">❖</span><span class="line"></span></div>
+            <p class="summary">Soal diagnostik kontekstual, panduan wawancara klinis, angket AQ 36 butir, pre/post test, dan empat lembar kerja peserta didik (LKPD).</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>27<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bagian 5.1</div>
+          <h3 class="section">Soal Diagnostik Awal</h3>
+          <p>Dua soal diagnostik kontekstual untuk mengidentifikasi <em>learning obstacles</em> sebelum implementasi pembelajaran.</p>
+          <div class="callout maroon">
+            <span class="callout-title">Soal Diagnostik 1 — Drone Pengirim Air</span>
+            <p style="margin: 0; font-size: 11.5px;">Sebuah drone pengirim air ke daerah bencana memiliki kapasitas maksimum <strong>20 liter</strong> dan jarak tempuh maksimum <strong>15 km</strong>. Setiap 1 km perjalanan menghabiskan 0,5 liter bahan bakar yang dicampurkan dengan air. Misalkan <em>x</em> = liter air murni, <em>y</em> = km perjalanan. Tentukan model matematika dan daerah penyelesaiannya.</p>
+          </div>
+          <div class="callout emerald">
+            <span class="callout-title">Soal Diagnostik 2 — Drone Sprayer Pupuk</span>
+            <p style="margin: 0; font-size: 11.5px;">Drone sprayer untuk lahan pertanian membawa pupuk cair (<em>x</em> liter) dan pestisida (<em>y</em> liter). Total beban tidak melebihi 25 kg, dengan 1 liter pupuk = 1,2 kg dan 1 liter pestisida = 0,8 kg. Anggaran maksimum Rp 500.000 dengan harga pupuk Rp 15.000/L dan pestisida Rp 25.000/L. Susun sistem pertidaksamaan linear dua variabel.</p>
+          </div>
+          <h4 class="sub">Rubrik Penilaian Diagnostik</h4>
+          <table>
+            <thead><tr><th>Aspek</th><th>4 (Tinggi)</th><th>2 (Sedang)</th><th>0 (Rendah)</th></tr></thead>
+            <tbody>
+              <tr><td>Pemodelan</td><td>Tepat &amp; lengkap</td><td>Sebagian benar</td><td>Tidak ada</td></tr>
+              <tr><td>Komputasi</td><td>Akurat</td><td>Kesalahan minor</td><td>Salah konsep</td></tr>
+              <tr><td>Interpretasi</td><td>Kontekstual</td><td>Mekanis</td><td>Tidak relevan</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>28<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 17: Wawancara + Angket AQ -->
+    <div class="leaf" data-leaf="17">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Bagian 5.2</div>
+          <h3 class="section">Panduan Wawancara Klinis</h3>
+          <p>Wawancara semi-terstruktur menggali <em>learning obstacles</em> dari empat dimensi: ontogenis, didaktis, epistemologis, dan psikologis. Durasi 25–30 menit per siswa setelah soal diagnostik.</p>
+          <table>
+            <thead><tr><th>Dimensi LO</th><th>Pertanyaan Pemandu</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Ontogenis</strong></td><td>"Bagaimana perasaanmu saat melihat soal ini?" · "Apa yang kamu pikirkan pertama kali?"</td></tr>
+              <tr><td><strong>Didaktis</strong></td><td>"Bagaimana gurumu mengajarkan SPtLDV?" · "Pernahkah kamu menemui soal seperti ini?"</td></tr>
+              <tr><td><strong>Epistemologis</strong></td><td>"Mengapa kamu memilih cara itu?" · "Apa makna garis putus-putus pada grafikmu?"</td></tr>
+              <tr><td><strong>Psikologis</strong></td><td>"Apa yang kamu lakukan saat merasa stuck?" · "Apakah kamu yakin dengan jawabanmu?"</td></tr>
+            </tbody>
+          </table>
+          <div class="callout">
+            <span class="callout-title">Prinsip Wawancara</span>
+            <p style="margin: 0; font-size: 11px;">Bersifat menggali, <strong>bukan menguji</strong>. Pewawancara menggunakan teknik <em>probing</em> netral, menghindari koreksi langsung, dan mendokumentasikan respons verbal serta nonverbal (jeda, ekspresi) yang menunjukkan kesulitan kognitif.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>29<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bagian 5.3</div>
+          <h3 class="section">Angket Adversity Quotient (36 Butir)</h3>
+          <p>Adaptasi dari <em>Adversity Response Profile</em> (Stoltz, 1997). Skala Likert 1–5 dengan empat dimensi CORE.</p>
+          <h4 class="sub">Struktur Angket per Dimensi (9 butir × 4)</h4>
+          <table>
+            <thead><tr><th>Dimensi</th><th>Indikator</th><th>Contoh Butir</th></tr></thead>
+            <tbody>
+              <tr><td><strong style="color:var(--emerald-deep);">CONTROL</strong></td><td>Persepsi kendali atas kesulitan</td><td>"Saya mampu mengubah hasil ujian saya melalui usaha keras."</td></tr>
+              <tr><td><strong style="color:var(--emerald-deep);">OWNERSHIP</strong></td><td>Tanggung jawab terhadap hasil</td><td>"Ketika nilai matematika saya turun, saya perlu mengevaluasi cara belajar saya."</td></tr>
+              <tr><td><strong style="color:var(--emerald-deep);">REACH</strong></td><td>Jangkauan dampak masalah</td><td>"Kegagalan dalam satu bab matematika tidak memengaruhi minat saya pada pelajaran lain."</td></tr>
+              <tr><td><strong style="color:var(--emerald-deep);">ENDURANCE</strong></td><td>Ketahanan menghadapi kesulitan</td><td>"Saya akan terus mencoba meskipun soal matematika terasa sulit dipecahkan."</td></tr>
+            </tbody>
+          </table>
+          <div class="callout emerald">
+            <span class="callout-title">Sistem Penskoran &amp; Klasifikasi</span>
+            <p style="margin: 0; font-size: 11px;">Total skor 36–180. <strong>Quitter</strong>: 36–84 · <strong>Camper</strong>: 85–134 · <strong>Climber</strong>: 135–180. Validitas konstruk dan reliabilitas Cronbach's α &gt; 0,80 wajib dipenuhi sebelum penggunaan.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>30<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 18: Pre-Test + Post-Test -->
+    <div class="leaf" data-leaf="18">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Bagian 5.4</div>
+          <h3 class="section">Tes Awal — Pre-Test</h3>
+          <p>Mengukur tingkat kemampuan numerasi awal sebelum implementasi metode SCALE. Konteks autentik, level kognitif berjenjang.</p>
+          <div class="callout maroon">
+            <span class="callout-title">Konteks: Bisnis Online Andi</span>
+            <p style="margin: 0; font-size: 11.5px;">Andi memulai bisnis <em>online</em> menjual dua produk: kerajinan tangan (<em>x</em>) dengan modal Rp 25.000 dan keuntungan Rp 15.000, serta aksesoris (<em>y</em>) dengan modal Rp 18.000 dan keuntungan Rp 10.000. Modal awal Andi Rp 1.500.000 dan kapasitas penyimpanan maksimum 70 unit.</p>
+            <p style="margin: 8px 0 0 0; font-size: 11px;"><strong>L1.</strong> Tuliskan pertidaksamaan modal &amp; kapasitas. <strong>L2.</strong> Tentukan daerah penyelesaian. <strong>L3.</strong> Hitung kombinasi optimal yang memaksimalkan keuntungan.</p>
+          </div>
+          <h4 class="sub">Profil Kognitif Soal</h4>
+          <table>
+            <thead><tr><th>Level</th><th>Domain Kognitif</th><th>Bobot</th></tr></thead>
+            <tbody>
+              <tr><td>1 — <em>Knowing</em></td><td>Identifikasi variabel, konversi pernyataan</td><td>30%</td></tr>
+              <tr><td>2 — <em>Applying</em></td><td>Pemodelan, grafik daerah feasible</td><td>40%</td></tr>
+              <tr><td>3 — <em>Reasoning</em></td><td>Optimasi, justifikasi solusi</td><td>30%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>31<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bagian 5.5</div>
+          <h3 class="section">Tes Akhir — Post-Test</h3>
+          <p>Konteks <strong>isomorfik</strong> dengan pre-test (struktur kognitif sama, konteks berbeda) untuk meminimalkan <em>practice effect</em> sekaligus mengukur capaian pembelajaran.</p>
+          <div class="callout emerald">
+            <span class="callout-title">Konteks: Program Hemat Listrik</span>
+            <p style="margin: 0; font-size: 11.5px;">Sebuah keluarga mengganti dua jenis lampu: LED (<em>x</em> unit) seharga Rp 35.000 dengan penghematan Rp 5.000/bulan, dan lampu hemat energi (<em>y</em> unit) seharga Rp 22.000 dengan penghematan Rp 3.500/bulan. Anggaran Rp 700.000, total titik lampu 25.</p>
+            <p style="margin: 8px 0 0 0; font-size: 11px;"><strong>L1.</strong> Tuliskan SPtLDV anggaran &amp; jumlah titik. <strong>L2.</strong> Gambarkan daerah feasible. <strong>L3.</strong> Maksimalkan penghematan bulanan, identifikasi <em>binding constraint</em>.</p>
+          </div>
+          <h4 class="sub">Indikator Pencapaian Pembelajaran</h4>
+          <table>
+            <thead><tr><th>Indikator</th><th>Pre-Test (target)</th><th>Post-Test (target)</th></tr></thead>
+            <tbody>
+              <tr><td>Pemodelan kontekstual</td><td>≥ 50%</td><td>≥ 80%</td></tr>
+              <tr><td>Visualisasi daerah feasible</td><td>≥ 40%</td><td>≥ 75%</td></tr>
+              <tr><td>Optimasi &amp; interpretasi</td><td>≥ 30%</td><td>≥ 70%</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size: 11.5px;"><em>N-Gain</em> &gt; 0,3 dianggap pertumbuhan signifikan; &gt; 0,7 menunjukkan capaian tinggi.</p>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>32<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 19: LKPD + BAB VI Divider -->
+    <div class="leaf" data-leaf="19">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Bagian 5.6</div>
+          <h3 class="section">Lembar Kerja Peserta Didik (LKPD)</h3>
+          <p>Empat LKPD selaras dengan SD1–SD4. Setiap LKPD memuat: konteks autentik, langkah pemodelan terbimbing, ruang eksplorasi, dan pertanyaan refleksi.</p>
+          <div class="profile-grid">
+            <div class="profile-card" style="border-left: 4px solid var(--maroon);">
+              <div class="profile-name" style="color:var(--maroon);">LKPD 1</div>
+              <div class="profile-tag">Jajanan Kantin</div>
+              <p style="font-size: 10.5px; margin: 6px 0 0 0;">Pengenalan SPtLDV; pemodelan harga &amp; jumlah, daerah feasible sederhana, kalibrasi <em>scaffolding</em> per profil.</p>
+            </div>
+            <div class="profile-card" style="border-left: 4px solid var(--gold-deep);">
+              <div class="profile-name" style="color:var(--gold-deep);">LKPD 2</div>
+              <div class="profile-tag">Layanan Fotokopi</div>
+              <p style="font-size: 10.5px; margin: 6px 0 0 0;">Pertidaksamaan dua kendala (waktu &amp; biaya), <em>worked example</em> bertingkat, transisi ke <em>fading</em>.</p>
+            </div>
+            <div class="profile-card" style="border-left: 4px solid var(--emerald-deep);">
+              <div class="profile-name" style="color:var(--emerald-deep);">LKPD 3</div>
+              <div class="profile-tag">Perencanaan Acara</div>
+              <p style="font-size: 10.5px; margin: 6px 0 0 0;">Tiga skenario, multi-perspektif, <em>Anonymous Gallery</em>, justifikasi pilihan strategi.</p>
+            </div>
+            <div class="profile-card" style="border-left: 4px solid var(--ink);">
+              <div class="profile-name" style="color:var(--ink);">LKPD 4</div>
+              <div class="profile-tag">Optimasi Toko Roti</div>
+              <p style="font-size: 10.5px; margin: 6px 0 0 0;">Integrasi komprehensif, <em>scaffolding</em> minimal, analisis <em>binding constraint</em>, transfer ke konteks baru.</p>
+            </div>
+          </div>
+          <p style="font-size: 11.5px; margin-top: 10px;"><em>Catatan:</em> LKPD versi lengkap dengan kunci dan rubrik tersedia pada lampiran terpisah.</p>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>33<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="chapter-divider">
+            <div class="roman">VI</div>
+            <div class="label">Bab Keenam</div>
+            <h1>Panduan Praktis untuk Guru</h1>
+            <div class="ornament-rule"><span class="line"></span><span class="glyph">❖</span><span class="line"></span></div>
+            <p class="summary">Persiapan, pelaksanaan lima fase SCALE, diferensiasi pembelajaran, evaluasi, dan refleksi guru — disajikan dalam alur operasional yang siap dipraktikkan.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>34<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 20: Persiapan + Pelaksanaan SCALE -->
+    <div class="leaf" data-leaf="20">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Bagian 6.1</div>
+          <h3 class="section">Persiapan Pembelajaran</h3>
+          <p>Empat langkah operasional sebelum implementasi metode SCALE di kelas:</p>
+          <table>
+            <thead><tr><th>Langkah</th><th>Aktivitas</th><th>Output</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1</strong></td><td>Sebar angket AQ 36 butir, hitung skor total</td><td>Klasifikasi siswa: Quitter / Camper / Climber</td></tr>
+              <tr><td><strong>2</strong></td><td>Berikan soal diagnostik &amp; wawancara klinis</td><td>Pemetaan <em>learning obstacles</em> per siswa</td></tr>
+              <tr><td><strong>3</strong></td><td>Kelompokkan siswa secara heterogen (1Q + 2C + 1Cl per kelompok 4 orang)</td><td>Komposisi kelompok yang produktif</td></tr>
+              <tr><td><strong>4</strong></td><td>Siapkan kode warna lembar kerja (sesuai profil) dan media (Desmos, kartu, stabilo)</td><td>Materi siap pakai per fase SCALE</td></tr>
+            </tbody>
+          </table>
+          <div class="callout">
+            <span class="callout-title">Sistem Kode Warna LKPD</span>
+            <p style="margin: 0; font-size: 11px;"><span style="color: var(--maroon);">●</span> <strong>Merah</strong> — versi Quitter (langkah eksplisit, <em>worked example</em>) · <span style="color: var(--gold-deep);">●</span> <strong>Kuning</strong> — versi Camper (panduan moderat, eksplorasi terarah) · <span style="color: var(--emerald-deep);">●</span> <strong>Hijau</strong> — versi Climber (pertanyaan terbuka, tantangan ekstensi).</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>35<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bagian 6.2</div>
+          <h3 class="section">Pelaksanaan 5 Fase SCALE</h3>
+          <p>Panduan tindakan guru pada setiap fase, dengan fokus pada <em>scaffolding</em> berdiferensiasi.</p>
+          <table>
+            <thead><tr><th>Fase</th><th>Tindakan Kunci Guru</th></tr></thead>
+            <tbody>
+              <tr><td><strong>S</strong> — Situate</td><td>Aktivasi pengetahuan awal melalui konteks autentik; cek prasyarat aljabar dasar; gali pengalaman siswa.</td></tr>
+              <tr><td><strong>C</strong> — Construct</td><td>Berikan <em>scaffolding</em> berbeda per profil. Quitter: <em>worked example</em> + <em>checklist</em>. Camper: pertanyaan pemandu. Climber: tantangan terbuka, eksplorasi mandiri.</td></tr>
+              <tr><td><strong>A</strong> — Assess</td><td><em>Anonymous Gallery</em> — siswa memajang pekerjaan tanpa identitas; rotasi observasi, komentar konstruktif. Mengurangi kecemasan, mendorong perbandingan strategi.</td></tr>
+              <tr><td><strong>L</strong> — Link</td><td>Sintesis konsep formal dari beragam strategi siswa; bahas miskonsepsi yang muncul; konfirmasi terminologi (titik sudut, daerah feasible, <em>binding constraint</em>).</td></tr>
+              <tr><td><strong>E</strong> — Extend</td><td>Berikan tugas transfer ke konteks baru; <em>fading scaffolding</em> bertahap; refleksi metakognitif tertulis (3 menit).</td></tr>
+            </tbody>
+          </table>
+          <div class="callout emerald">
+            <span class="callout-title">Tip: Fading Scaffolding</span>
+            <p style="margin: 0; font-size: 11px;">Dari SD1 ke SD4, intensitas bantuan menurun: SD1 (<em>worked example</em> penuh) → SD2 (<em>partial example</em>) → SD3 (<em>scaffold</em> berbasis pertanyaan) → SD4 (<em>scaffold</em> minimal). Pemantauan ketat agar tidak terjadi <em>premature withdrawal</em>.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>36<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 21: Diferensiasi + Evaluasi & Refleksi -->
+    <div class="leaf" data-leaf="21">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Bagian 6.3</div>
+          <h3 class="section">Diferensiasi Pembelajaran</h3>
+          <p>Tabel 6.1 — Strategi diferensiasi terkait <em>content</em>, <em>process</em>, <em>product</em>, dan <em>learning environment</em> (Tomlinson, 2014) yang disesuaikan dengan profil AQ.</p>
+          <table>
+            <thead><tr><th>Aspek</th><th>Quitter</th><th>Camper</th><th>Climber</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Content</strong></td><td>Konteks familiar, vokabuler sederhana</td><td>Konteks moderat, kosa kata teknis terkontrol</td><td>Konteks kompleks, multi-variabel</td></tr>
+              <tr><td><strong>Process</strong></td><td><em>Worked example</em> bertahap</td><td>Pertanyaan pemandu</td><td>Eksplorasi terbuka, <em>inquiry</em></td></tr>
+              <tr><td><strong>Product</strong></td><td><em>Checklist</em> langkah</td><td>Penjelasan lisan/tulisan</td><td>Justifikasi multi-strategi</td></tr>
+              <tr><td><strong>Environment</strong></td><td><em>Low-stake, high-support</em></td><td>Kolaboratif</td><td>Kompetitif konstruktif</td></tr>
+            </tbody>
+          </table>
+          <div class="callout">
+            <span class="callout-title">Catatan Penting</span>
+            <p style="margin: 0; font-size: 11px;">Diferensiasi <strong>bukan pelabelan permanen</strong>. Profil AQ bersifat dinamis; siswa Quitter dapat tumbuh menjadi Camper atau Climber melalui pengalaman keberhasilan terstruktur. Guru perlu memantau pergeseran profil setiap 4–6 minggu.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>37<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bagian 6.4</div>
+          <h3 class="section">Evaluasi &amp; Refleksi</h3>
+          <p>Evaluasi pembelajaran dilakukan secara <em>formatif</em> (selama proses) dan <em>sumatif</em> (di akhir siklus), menggunakan kombinasi instrumen kuantitatif dan kualitatif.</p>
+          <h4 class="sub">Indikator Keberhasilan Implementasi</h4>
+          <table>
+            <thead><tr><th>Indikator</th><th>Target</th></tr></thead>
+            <tbody>
+              <tr><td><em>N-Gain</em> kemampuan numerasi</td><td>&gt; 0,30 (rata-rata kelas)</td></tr>
+              <tr><td>Pergeseran profil AQ ke arah lebih tinggi</td><td>≥ 30% siswa</td></tr>
+              <tr><td>Resolusi <em>learning obstacles</em> teridentifikasi</td><td>≥ 70% per kelompok</td></tr>
+              <tr><td>Kepuasan &amp; <em>self-efficacy</em> siswa</td><td>Skor angket &gt; 75%</td></tr>
+            </tbody>
+          </table>
+          <h4 class="sub">Refleksi Guru — Pertanyaan Pemandu</h4>
+          <ul style="font-size: 11.5px; margin: 4px 0 0 16px; padding: 0; line-height: 1.6;">
+            <li>Apakah <em>scaffolding</em> yang saya berikan sesuai dengan zona perkembangan setiap profil?</li>
+            <li>Adakah miskonsepsi baru yang muncul? Bagaimana saya menanggapinya?</li>
+            <li>Apa bukti pertumbuhan AQ pada siswa Quitter saya minggu ini?</li>
+            <li>Bagaimana saya bisa memperhalus <em>fading</em> di siklus berikutnya?</li>
+          </ul>
+          <div class="callout emerald" style="margin-top: 10px;">
+            <span class="callout-title">Jurnal Reflektif</span>
+            <p style="margin: 0; font-size: 11px;">Catatan reflektif ditulis setiap akhir pertemuan (5–10 menit). Pola lintas-pertemuan menjadi data kualitatif berharga untuk perbaikan berkelanjutan.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>38<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 22: BAB VII Divider + Kesimpulan + Implikasi -->
+    <div class="leaf" data-leaf="22">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="chapter-divider">
+            <div class="roman">VII</div>
+            <div class="label">Bab Ketujuh</div>
+            <h1>Penutup</h1>
+            <div class="ornament-rule"><span class="line"></span><span class="glyph">❖</span><span class="line"></span></div>
+            <p class="summary">Kesimpulan, implikasi pedagogis, saran bagi praktisi, peneliti, dan pengembang kurikulum, serta refleksi akhir bagi guru yang menempuh perjalanan ini.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>39<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bagian 7.1</div>
+          <h3 class="section">Kesimpulan</h3>
+          <p>Buku panduan ini menyajikan kerangka <em>desain didaktis</em> berbasis <em>scaffolded instruction</em> dan <em>adversity quotient</em> untuk mengatasi <em>learning obstacles</em> pada topik SPtLDV. Tiga simpulan utama:</p>
+          <ol style="font-size: 11.5px; margin: 4px 0 10px 18px; padding: 0; line-height: 1.65;">
+            <li><strong>Diferensiasi berbasis AQ efektif</strong> — siswa Quitter, Camper, dan Climber merespons jenis <em>scaffolding</em> yang berbeda; pendekatan tunggal tidak cukup.</li>
+            <li><strong>Metode SCALE memfasilitasi progresi</strong> — lima fase (Situate, Construct, Assess, Link, Extend) menjamin kontinuitas dari pengaktifan pengetahuan hingga transfer pembelajaran.</li>
+            <li><strong>Konteks autentik kunci pengurangan kecemasan</strong> — soal kontekstual (kantin, fotokopi, toko roti) membangun jembatan antara matematika abstrak dan pengalaman siswa.</li>
+          </ol>
+          <h4 class="sub">Implikasi Pedagogis</h4>
+          <div class="callout emerald">
+            <span class="callout-title">Untuk Guru</span>
+            <p style="margin: 0; font-size: 11px;">Pemahaman profil AQ sebagai dasar perencanaan; penguasaan teknik <em>fading scaffolding</em>; pengembangan instrumen diagnostik yang sensitif terhadap dimensi LO.</p>
+          </div>
+          <div class="callout">
+            <span class="callout-title">Untuk Sekolah &amp; Kurikulum</span>
+            <p style="margin: 0; font-size: 11px;">Penyediaan ruang dan waktu untuk diferensiasi; integrasi instrumen non-kognitif (AQ) dalam asesmen awal; pelatihan guru berkelanjutan dalam <em>didactical engineering</em>.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>40<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 23: Saran + Refleksi Akhir -->
+    <div class="leaf" data-leaf="23">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Bagian 7.2</div>
+          <h3 class="section">Saran</h3>
+          <h4 class="sub">Untuk Praktisi</h4>
+          <p style="font-size: 11.5px;">Mulai dengan <strong>satu kelas</strong> dan satu topik untuk membangun kemahiran sebelum skalasi. Pertahankan jurnal reflektif. Bentuk komunitas belajar guru (<em>professional learning community</em>) untuk berbagi praktik diferensiasi.</p>
+          <h4 class="sub">Untuk Peneliti</h4>
+          <p style="font-size: 11.5px;">Penelitian lanjutan diperlukan pada: (1) durabilitas pergeseran AQ pada rentang waktu &gt; 1 tahun; (2) interaksi AQ dengan variabel sosio-kultural; (3) adaptasi metode SCALE untuk topik matematika lain (statistika, geometri analitik); (4) versi digital dengan <em>adaptive learning analytics</em>.</p>
+          <h4 class="sub">Untuk Pengembang Kurikulum</h4>
+          <p style="font-size: 11.5px;">Rekomendasi integrasi: dimensi <em>adversity quotient</em> dalam profil pelajar Pancasila; modul guru berbasis profil siswa heterogen; rubrik diferensiasi sebagai standar minimum perencanaan pembelajaran.</p>
+          <div class="callout maroon" style="margin-top: 12px;">
+            <span class="callout-title">Keterbatasan</span>
+            <p style="margin: 0; font-size: 11px;">Implementasi memerlukan komitmen waktu yang signifikan untuk diagnostik awal (~ 2 pertemuan). Kelas besar (&gt; 35 siswa) membutuhkan modifikasi dalam pengelompokan dan pemantauan. Validasi instrumen AQ dalam konteks budaya lokal terus disempurnakan.</p>
+          </div>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>41<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Bagian 7.3</div>
+          <h3 class="section">Refleksi Akhir</h3>
+          <p>Setiap kelas matematika adalah ekosistem yang kompleks. Di dalamnya hidup siswa-siswa dengan latar pengalaman, ketahanan emosional, dan jejak miskonsepsi yang berbeda. Tugas pendidik bukan menyamaratakan, melainkan membaca dan merespons keragaman itu dengan cermat.</p>
+          <p>Buku ini menawarkan <em>alat baca</em>: angket AQ, soal diagnostik, wawancara klinis, kerangka SCALE. Tetapi alat hanyalah perpanjangan tangan. Jiwanya tetap pada guru — pada kepekaan untuk mengamati, kesabaran untuk menunggu pemahaman tumbuh, dan keberanian untuk mempercayai bahwa setiap siswa, betapapun terjal medannya, dapat menjadi pendaki ide-idenya sendiri.</p>
+          <div class="ornament-rule" style="margin: 22px 0;"><span class="line"></span><span class="glyph">❦</span><span class="line"></span></div>
+          <div class="closing-quote">
+            <em style="display:block; font-family: 'Cormorant Garamond', serif; font-size: 19px; line-height: 1.45; color: var(--emerald-deep); text-align: center;">"Setiap siswa dapat belajar — hanya saja tidak selalu dengan cara yang sama, dalam hari yang sama, dengan kecepatan yang sama."</em>
+            <p style="text-align: center; margin: 12px 0 0 0; font-size: 11.5px; color: var(--ink); opacity: 0.75;">— George Evans, dikutip dalam Tomlinson (2014)</p>
+          </div>
+          <div class="ornament-rule" style="margin: 22px 0;"><span class="line"></span><span class="glyph">❦</span><span class="line"></span></div>
+          <p style="text-align: center; font-size: 11.5px; font-style: italic; color: var(--ink); opacity: 0.8;">Selamat menemani siswa Anda mendaki.</p>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>42<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 24: Daftar Pustaka -->
+    <div class="leaf" data-leaf="24">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Referensi</div>
+          <h3 class="section">Daftar Pustaka</h3>
+          <ul class="biblio">
+            <li>Brousseau, G. (1997). <em>Theory of Didactical Situations in Mathematics</em>. Dordrecht: Kluwer Academic Publishers.</li>
+            <li>Gravemeijer, K. (2004). Local Instruction Theories as Means of Support for Teachers in Reform Mathematics Education. <em>Mathematical Thinking and Learning</em>, 6(2), 105–128.</li>
+            <li>Han, S., &amp; Capraro, R. M. (2014). The Effects of STEM PBL on Students' Mathematical and Scientific Vocabulary Knowledge. <em>International Journal of Science and Mathematics Education</em>, 12(1), 131–146.</li>
+            <li>Kemendikbudristek. (2022). <em>Kerangka Dasar dan Struktur Kurikulum Merdeka pada Pendidikan Menengah</em>. Jakarta: Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi.</li>
+            <li>OECD. (2019). <em>PISA 2018 Results (Volume I): What Students Know and Can Do</em>. Paris: OECD Publishing.</li>
+            <li>Stoltz, P. G. (1997). <em>Adversity Quotient: Turning Obstacles into Opportunities</em>. New York: John Wiley &amp; Sons.</li>
+            <li>Stoltz, P. G. (2000). <em>Adversity Quotient @ Work: Make Everyday Challenges the Key to Your Success</em>. New York: HarperCollins.</li>
+            <li>Suryadi, D. (2019). <em>Landasan Filosofis Penelitian Desain Didaktis (DDR)</em>. Bandung: Gapura Press.</li>
+            <li>Tomlinson, C. A. (2014). <em>The Differentiated Classroom: Responding to the Needs of All Learners</em> (2nd ed.). Alexandria: ASCD.</li>
+            <li>Vygotsky, L. S. (1978). <em>Mind in Society: The Development of Higher Psychological Processes</em>. Cambridge, MA: Harvard University Press.</li>
+            <li>Wood, D., Bruner, J. S., &amp; Ross, G. (1976). The Role of Tutoring in Problem Solving. <em>Journal of Child Psychology and Psychiatry</em>, 17(2), 89–100.</li>
+          </ul>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>43<span class="ornament"></span></div>
+      </div>
+      <div class="page back">
+        <div class="page-inner">
+          <div class="eyebrow">Glosarium</div>
+          <h3 class="section">Glosarium &amp; Istilah Kunci</h3>
+          <dl class="glossary">
+            <dt>Adversity Quotient (AQ)</dt>
+            <dd>Kapasitas individu menghadapi dan mengubah kesulitan menjadi peluang; diukur melalui empat dimensi CORE (Stoltz, 1997).</dd>
+            <dt>Anonymous Gallery</dt>
+            <dd>Teknik asesmen di mana karya siswa dipajang tanpa identitas, mengurangi kecemasan sosial dan mendorong perbandingan strategi.</dd>
+            <dt>Binding Constraint</dt>
+            <dd>Kendala yang aktif (mengikat) pada solusi optimal; menentukan batas tertinggi nilai fungsi objektif.</dd>
+            <dt>Camper</dt>
+            <dd>Profil AQ menengah; siswa yang berkemampuan namun cenderung berhenti pada level kenyamanan, prosedural tanpa eksplorasi mendalam.</dd>
+            <dt>Climber</dt>
+            <dd>Profil AQ tinggi; siswa yang persisten, mencari tantangan, dan mampu mengelola kesulitan dengan baik.</dd>
+            <dt>CORE</dt>
+            <dd>Empat dimensi AQ: <em>Control</em> (kendali), <em>Ownership</em> (tanggung jawab), <em>Reach</em> (jangkauan), <em>Endurance</em> (ketahanan).</dd>
+          </dl>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>44<span class="ornament"></span></div>
+      </div>
+    </div>
+
+    <!-- LEAF 25: Glosarium lanjutan + Endpaper -->
+    <div class="leaf" data-leaf="25">
+      <div class="page front">
+        <div class="page-inner">
+          <div class="eyebrow">Glosarium · Lanjutan</div>
+          <h3 class="section">Istilah Kunci (sambungan)</h3>
+          <dl class="glossary">
+            <dt>Daerah Feasible</dt>
+            <dd>Himpunan semua titik (x, y) yang memenuhi seluruh pertidaksamaan dalam SPtLDV; representasi grafis solusi yang mungkin.</dd>
+            <dt>Desain Didaktis</dt>
+            <dd>Rancangan pembelajaran yang sistematis dan reflektif, mempertimbangkan situasi didaktis, hambatan belajar, dan respons siswa (Suryadi, 2019).</dd>
+            <dt>Fading</dt>
+            <dd>Proses pengurangan bantuan secara bertahap seiring meningkatnya kemandirian siswa; ciri khas <em>scaffolded instruction</em>.</dd>
+            <dt>Learning Obstacle (LO)</dt>
+            <dd>Hambatan belajar yang berasal dari empat sumber: ontogenis, didaktis, epistemologis, dan psikologis (Brousseau, 1997).</dd>
+            <dt>Metode SCALE</dt>
+            <dd>Akronim dari lima fase: <em>Situate</em>, <em>Construct</em>, <em>Assess</em>, <em>Link</em>, <em>Extend</em>; kerangka pelaksanaan pembelajaran berdiferensiasi.</dd>
+            <dt>Numerasi</dt>
+            <dd>Kemampuan menggunakan konsep matematis untuk memecahkan masalah dalam berbagai konteks kehidupan (OECD, 2019).</dd>
+            <dt>Quitter</dt>
+            <dd>Profil AQ rendah; siswa yang cenderung menyerah dini saat menghadapi kesulitan, kecemasan tinggi terhadap matematika.</dd>
+            <dt>Scaffolding</dt>
+            <dd>Bantuan terstruktur dari guru atau teman sebaya yang memungkinkan siswa menyelesaikan tugas di atas kemampuan mandirinya (Wood, Bruner, &amp; Ross, 1976).</dd>
+            <dt>SPtLDV</dt>
+            <dd>Sistem Pertidaksamaan Linear Dua Variabel; gabungan dua atau lebih pertidaksamaan linear yang memuat dua variabel.</dd>
+            <dt>Worked Example</dt>
+            <dd>Contoh soal beserta langkah penyelesaian yang sudah diuraikan, digunakan sebagai pemodelan kognitif eksplisit.</dd>
+            <dt>Zone of Proximal Development (ZPD)</dt>
+            <dd>Selisih antara kemampuan mandiri dan kemampuan dengan bantuan; ruang ideal untuk pembelajaran bermakna (Vygotsky, 1978).</dd>
+          </dl>
+        </div>
+        <div class="page-footer"><span class="ornament"></span>45<span class="ornament"></span></div>
+      </div>
+      <div class="page back endpaper-back">
+        <div class="page-inner">
+          <div class="endpaper-content">
+            <div class="endpaper-glyph">❦</div>
+            <p class="endpaper-line">Kepada para pendidik yang membaca buku ini —</p>
+            <p class="endpaper-line">terima kasih telah memilih untuk membaca, mempraktikkan,</p>
+            <p class="endpaper-line">dan menyempurnakan apa yang ada di sini.</p>
+            <div class="ornament-rule" style="margin: 28px auto; max-width: 220px;"><span class="line"></span><span class="glyph">✦</span><span class="line"></span></div>
+            <p class="endpaper-line">Setiap halaman yang Anda terapkan</p>
+            <p class="endpaper-line">adalah satu langkah lebih dekat</p>
+            <p class="endpaper-line">menuju kelas yang lebih adil dan bermakna.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEAF 26: Back Cover -->
+    <div class="leaf" data-leaf="26">
+      <div class="page front endpaper-back">
+        <div class="page-inner" style="display: flex; align-items: center; justify-content: center;">
+          <div style="text-align: center; opacity: 0.5;">
+            <div style="font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 0.4em; color: var(--emerald-deep);">FINIS</div>
+            <div style="margin-top: 14px; font-size: 28px; color: var(--gold-deep);">❦</div>
+          </div>
+        </div>
+      </div>
+      <div class="page back back-cover">
+        <div class="back-cover-inner">
+          <div class="back-cover-top">
+            <div class="back-cover-eyebrow">Buku Panduan Pendidikan</div>
+            <div class="back-cover-glyph">❦</div>
+          </div>
+          <div class="back-cover-blurb">
+            <p>Sebuah panduan praktis bagi guru matematika SMA/SMK/MA dalam merancang pembelajaran SPtLDV yang berdiferensiasi — memadukan <em>scaffolded instruction</em>, <em>adversity quotient</em>, dan kerangka <strong>SCALE</strong>.</p>
+            <p>Lengkap dengan instrumen diagnostik, panduan wawancara klinis, angket AQ 36 butir, empat skenario pembelajaran (SD1–SD4), dan rubrik penilaian numerasi berbasis konteks autentik.</p>
+          </div>
+          <div class="back-cover-quote">
+            <em>"Setiap siswa dapat belajar — hanya saja tidak selalu dengan cara yang sama."</em>
+          </div>
+          <div class="back-cover-bottom">
+            <div class="back-cover-publisher">
+              <div class="pub-mark">❦</div>
+              <div class="pub-name">Makassar · 2025</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSERT_LEAVES_HERE -->
+
+  </div>
+</div>
+
+<!-- Navigation Controls -->
+<div class="nav-controls">
+  <button class="nav-btn" id="firstBtn" title="Halaman pertama">⇤</button>
+  <button class="nav-btn" id="prevBtn" title="Sebelumnya">‹</button>
+  <div class="page-counter"><span class="current" id="currentPage">1</span> / <span id="totalPages">2</span></div>
+  <button class="nav-btn" id="nextBtn" title="Selanjutnya">›</button>
+  <button class="nav-btn" id="lastBtn" title="Halaman terakhir">⇥</button>
+</div>
+
+<!-- TOC Overlay -->
+<div class="toc-overlay" id="tocOverlay">
+  <div class="toc-panel">
+    <button class="toc-close" id="tocCloseBtn">×</button>
+    <div class="toc-sub">Index · Daftar</div>
+    <h2>Daftar Isi</h2>
+    <div class="ornament-rule"><span class="line"></span><span class="glyph">❖</span><span class="line"></span></div>
+    <ul class="toc-list" id="tocList"></ul>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  const leaves = Array.from(document.querySelectorAll('.leaf'));
+  const totalLeaves = leaves.length;
+  let currentLeaf = 0; // index of next leaf to be flipped (0..totalLeaves)
+
+  const currentPageEl = document.getElementById('currentPage');
+  const totalPagesEl = document.getElementById('totalPages');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const firstBtn = document.getElementById('firstBtn');
+  const lastBtn = document.getElementById('lastBtn');
+  const tocBtn = document.getElementById('tocBtn');
+  const tocOverlay = document.getElementById('tocOverlay');
+  const tocCloseBtn = document.getElementById('tocCloseBtn');
+  const tocList = document.getElementById('tocList');
+
+  // Set initial z-index: top leaves (low index) on top of stack
+  function resetZIndices() {
+    leaves.forEach((leaf, i) => {
+      if (leaf.classList.contains('flipped')) {
+        // Flipped leaves stack on the left; later flipped = higher z
+        leaf.style.zIndex = totalLeaves + i + 1;
+      } else {
+        // Unflipped: leaf 0 on top of right-side stack
+        leaf.style.zIndex = totalLeaves - i;
+      }
+    });
+  }
+
+  function updateUI() {
+    // Page count: each leaf = 2 pages
+    const totalPages = totalLeaves * 2;
+    // currentPage = pages that have been "turned past" + 1 (the current right-hand page)
+    // When currentLeaf=0, we're seeing page 1 (cover front)
+    // When currentLeaf=1, we've flipped 1 leaf, so we see pages 2-3 (leaf 0 back + leaf 1 front)
+    let displayPage;
+    if (currentLeaf === 0) {
+      displayPage = 1;
+    } else if (currentLeaf >= totalLeaves) {
+      displayPage = totalPages;
+    } else {
+      displayPage = currentLeaf * 2 + 1;
+    }
+    currentPageEl.textContent = displayPage;
+    totalPagesEl.textContent = totalPages;
+
+    prevBtn.disabled = currentLeaf === 0;
+    firstBtn.disabled = currentLeaf === 0;
+    nextBtn.disabled = currentLeaf >= totalLeaves;
+    lastBtn.disabled = currentLeaf >= totalLeaves;
+  }
+
+  function flipNext() {
+    if (currentLeaf >= totalLeaves) return;
+    const leaf = leaves[currentLeaf];
+    leaf.classList.add('flipped');
+    leaf.style.zIndex = totalLeaves + currentLeaf + 1;
+    currentLeaf++;
+    updateUI();
+  }
+
+  function flipPrev() {
+    if (currentLeaf <= 0) return;
+    currentLeaf--;
+    const leaf = leaves[currentLeaf];
+    leaf.classList.remove('flipped');
+    leaf.style.zIndex = totalLeaves - currentLeaf;
+    updateUI();
+  }
+
+  function goToLeaf(targetLeaf) {
+    targetLeaf = Math.max(0, Math.min(totalLeaves, targetLeaf));
+    if (targetLeaf > currentLeaf) {
+      // Flip forward
+      while (currentLeaf < targetLeaf) {
+        const leaf = leaves[currentLeaf];
+        leaf.classList.add('flipped');
+        leaf.style.zIndex = totalLeaves + currentLeaf + 1;
+        currentLeaf++;
+      }
+    } else if (targetLeaf < currentLeaf) {
+      while (currentLeaf > targetLeaf) {
+        currentLeaf--;
+        const leaf = leaves[currentLeaf];
+        leaf.classList.remove('flipped');
+        leaf.style.zIndex = totalLeaves - currentLeaf;
+      }
+    }
+    updateUI();
+  }
+
+  function goToFirst() { goToLeaf(0); }
+  function goToLast() { goToLeaf(totalLeaves); }
+
+  // Button bindings
+  prevBtn.addEventListener('click', flipPrev);
+  nextBtn.addEventListener('click', flipNext);
+  firstBtn.addEventListener('click', goToFirst);
+  lastBtn.addEventListener('click', goToLast);
+
+  // Click on book edges to flip
+  const book = document.querySelector('.book');
+  if (book) {
+    book.addEventListener('click', (e) => {
+      // Ignore if clicking on a link or interactive element
+      if (e.target.closest('a, button, input')) return;
+      const rect = book.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const isLeftHalf = clickX < rect.width / 2;
+      // Only treat clicks near edges (outer 25% on each side)
+      const edgeZone = rect.width * 0.25;
+      if (clickX < edgeZone) {
+        flipPrev();
+      } else if (clickX > rect.width - edgeZone) {
+        flipNext();
+      }
+    });
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (tocOverlay.classList.contains('open')) {
+      if (e.key === 'Escape') closeToc();
+      return;
+    }
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+      e.preventDefault();
+      flipNext();
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault();
+      flipPrev();
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      goToFirst();
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      goToLast();
+    }
+  });
+
+  // TOC overlay
+  function openToc() { tocOverlay.classList.add('open'); }
+  function closeToc() { tocOverlay.classList.remove('open'); }
+
+  if (tocBtn) tocBtn.addEventListener('click', openToc);
+  if (tocCloseBtn) tocCloseBtn.addEventListener('click', closeToc);
+  tocOverlay.addEventListener('click', (e) => {
+    if (e.target === tocOverlay) closeToc();
+  });
+
+  // Build TOC dynamically
+  const tocEntries = [
+    { type: 'front',   title: 'Sampul · Halaman Judul',           leaf: 0,  page: 'i' },
+    { type: 'front',   title: 'Kata Pengantar',                    leaf: 1,  page: 'ii' },
+    { type: 'front',   title: 'Daftar Isi',                        leaf: 2,  page: 'iii' },
+    { type: 'front',   title: 'Petunjuk Penggunaan Buku',          leaf: 2,  page: 'iv' },
+    { type: 'chapter', title: 'BAB I — Pendahuluan',               leaf: 3,  page: '1' },
+    { type: 'sub',     title: 'Latar Belakang',                    leaf: 3,  page: '2' },
+    { type: 'sub',     title: 'Tujuan, Sasaran, Kompetensi',       leaf: 4,  page: '4' },
+    { type: 'chapter', title: 'BAB II — Landasan Konseptual',      leaf: 5,  page: '5' },
+    { type: 'sub',     title: 'Adversity Quotient (AQ)',           leaf: 5,  page: '6' },
+    { type: 'sub',     title: 'Learning Obstacles',                leaf: 6,  page: '8' },
+    { type: 'sub',     title: 'Scaffolded Instruction & SCALE',    leaf: 7,  page: '9' },
+    { type: 'chapter', title: 'BAB III — Identifikasi & Profil',   leaf: 8,  page: '11' },
+    { type: 'sub',     title: 'Penentuan AQ',                      leaf: 8,  page: '12' },
+    { type: 'sub',     title: 'Profil Quitter · Camper · Climber', leaf: 9,  page: '14' },
+    { type: 'chapter', title: 'BAB IV — Implementasi 8 Pertemuan', leaf: 11, page: '17' },
+    { type: 'sub',     title: 'Pertemuan 1–2 (SD1 + Tes 1)',       leaf: 12, page: '19' },
+    { type: 'sub',     title: 'Pertemuan 3–4 (SD2 + Tes 2)',       leaf: 13, page: '21' },
+    { type: 'sub',     title: 'Pertemuan 5–6 (SD3 + Tes 3)',       leaf: 14, page: '23' },
+    { type: 'sub',     title: 'Pertemuan 7–8 (SD4 + Tes 4)',       leaf: 15, page: '25' },
+    { type: 'chapter', title: 'BAB V — Instrumen Penelitian',      leaf: 16, page: '27' },
+    { type: 'sub',     title: 'Soal Diagnostik',                   leaf: 16, page: '28' },
+    { type: 'sub',     title: 'Panduan Wawancara Klinis',          leaf: 17, page: '29' },
+    { type: 'sub',     title: 'Angket AQ 36 Butir',                leaf: 17, page: '30' },
+    { type: 'sub',     title: 'Pre-Test & Post-Test',              leaf: 18, page: '31' },
+    { type: 'sub',     title: 'LKPD (4 Lembar Kerja)',             leaf: 19, page: '33' },
+    { type: 'chapter', title: 'BAB VI — Panduan Praktis Guru',     leaf: 19, page: '34' },
+    { type: 'sub',     title: 'Persiapan Pembelajaran',            leaf: 20, page: '35' },
+    { type: 'sub',     title: 'Pelaksanaan 5 Fase SCALE',          leaf: 20, page: '36' },
+    { type: 'sub',     title: 'Diferensiasi Pembelajaran',         leaf: 21, page: '37' },
+    { type: 'sub',     title: 'Evaluasi & Refleksi',               leaf: 21, page: '38' },
+    { type: 'chapter', title: 'BAB VII — Penutup',                 leaf: 22, page: '39' },
+    { type: 'sub',     title: 'Kesimpulan & Implikasi',            leaf: 22, page: '40' },
+    { type: 'sub',     title: 'Saran',                             leaf: 23, page: '41' },
+    { type: 'sub',     title: 'Refleksi Akhir',                    leaf: 23, page: '42' },
+    { type: 'back',    title: 'Daftar Pustaka',                    leaf: 24, page: '43' },
+    { type: 'back',    title: 'Glosarium',                         leaf: 24, page: '44' }
+  ];
+
+  tocEntries.forEach(entry => {
+    const li = document.createElement('li');
+    li.className = entry.type;
+    li.innerHTML = `
+      <span class="toc-title">${entry.title}</span>
+      <span class="toc-dots"></span>
+      <span class="toc-num">${entry.page}</span>
+    `;
+    li.addEventListener('click', () => {
+      goToLeaf(entry.leaf);
+      closeToc();
+    });
+    tocList.appendChild(li);
+  });
+
+  // Initial setup
+  resetZIndices();
+  updateUI();
+
+  // Touch swipe support for mobile
+  let touchStartX = null;
+  let touchStartY = null;
+  document.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    if (touchStartX === null) return;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0) flipNext();
+      else flipPrev();
+    }
+    touchStartX = null;
+    touchStartY = null;
+  }, { passive: true });
+
+})();
+</script>
+</body>
+</html>
